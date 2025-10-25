@@ -1,0 +1,50 @@
+<resources>
+    <string name="version">Version: 0.1.0</string>
+
+    <string name="app_name">Todoshka</string>
+    <string name="settings_description">Settings</string>
+    <string name="todo_badge">To-Do</string>
+    <string name="search_hint">Try to find task…</string>
+    <string name="search_button">Search</string>
+    <string name="all_task">All Task</string>
+    <string name="empty_taskbox">Your task box is empty.</string>
+    <string name="add_task">Add Task</string>
+    <string name="empty_taskbox_hint">Once you create new task you\'ll\nsee it listed here</string>
+
+    <string name="what_name">What is Your Name ?</string>
+    <string name="what_name_hint">Please provide your name, which we\'ll use for display and personalize your to-do experience.</string>
+    <string name="enter_name">Enter Your Name</string>
+    <string name="get_start">Get Start</string>
+
+    <string name="settings">Settings</string>
+    <string name="customize">Customize</string>
+    <string name="edit_info">Edit Your Info</string>
+    <string name="share">Share</string>
+    <string name="rate_us">Rate us</string>
+    <string name="arrow_right">arrow right</string>
+    <string name="edit_icon">edit icon</string>
+    <string name="avatar">avatar</string>
+    <string name="arrow_back">arrow back</string>
+    <string name="you_can_change_your_name_and_avatar">You can change your Name and Avatar</string>
+    <string name="women">Women</string>
+    <string name="men">Men</string>
+    <string name="character">Character</string>
+
+    <string name="input_new_task_here">Input new task here…</string>
+    <string name="add_new_task">Add New task</string>
+    <string name="task_priority">Task priority</string>
+    <string name="arrow_down">arrow down</string>
+    <string name="select_category">Select Category</string>
+    <string name="category_name">Category Name</string>
+    <string name="input_category_name_here">Input Category name here...</string>
+    <string name="add_new_category">Add New Category</string>
+    <string name="category">Category</string>
+    <string name="delete">delete</string>
+    <string name="date">Date</string>
+    <string name="priority">Priority</string>
+    <string name="priority_icon">priority icon</string>
+    <string name="are_you_sure">Are You Sure?</string>
+    <string name="do_you_really_want_to_delete_this_task_this_process_can_t_be_undone">Do you really want to delete this task?\nthis process can\'t be undone.</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_button">Delete</string>
+</resources>

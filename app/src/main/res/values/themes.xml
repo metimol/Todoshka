@@ -1,0 +1,40 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Todoshka" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple</item>
+        <item name="colorPrimaryVariant">@color/light_purple</item>
+        <item name="colorOnPrimary">@color/deep_void</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/yellow</item>
+        <item name="colorSecondaryVariant">@color/light_yellow</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/deep_void</item>
+        <item name="android:navigationBarColor">@color/deep_void</item>
+
+        <!-- Style for Chip by default -->
+        <item name="chipStyle">@style/CategoryChip</item>
+    </style>
+
+    <!-- Application theme. -->
+    <style name="CircleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Style for category chips -->
+    <style name="CategoryChip" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/chip_text_selector</item>
+        <item name="chipBackgroundColor">@drawable/chip_background_selector</item>
+        <item name="chipStrokeColor">@color/server_chassis</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">16dp</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="ensureMinTouchTargetSize">false</item>
+        <item name="android:checkable">true</item>
+    </style>
+
+</resources>

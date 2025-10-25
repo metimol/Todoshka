@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple">#9B60F7</color>
+    <color name="light_purple">#C28AF8</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="terminal_steel">#616161</color>
+    <color name="blast_red">#FF5959</color>
+    <color name="transparent_blast_red">#26FF5959</color>
+    <color name="asphalt_base">#4F4F4F</color>
+    <color name="deep_dark">#202020</color>
+    <color name="server_chassis">#3A3A3A</color>
+    <color name="deep_void">#0E0E0E</color>
+    <color name="grey">#292929</color>
+    <color name="light_grey">#7B7B7B</color>
+    <color name="library_parchment">#F1F0F3</color>
+    <color name="yellow">#FFD159</color>
+    <color name="light_yellow">#FFDA7A</color>
+</resources>
