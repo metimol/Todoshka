@@ -1,11 +1,16 @@
 package com.metimol.todoshka;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -44,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     private TaskAdapter taskAdapter;
     private LinearLayout emptyStateLayout;
     private Chip chipAllTask;
+    private EditText etSearch;
+    private HorizontalScrollView chipScrollView;
 
     private final List<Chip> categoryChips = new ArrayList<>();
 
@@ -73,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         ImageView ivSettings = findViewById(R.id.ivSettings);
         FloatingActionButton fab = findViewById(R.id.fab);
         ImageView chipAdd = findViewById(R.id.chipAdd);
+        etSearch = findViewById(R.id.etSearch);
+        chipScrollView = findViewById(R.id.chipScrollView);
 
         rvTasks = findViewById(R.id.rvTasks);
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
@@ -97,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         setupRecyclerView();
         setupCategoryObserver();
         setupTaskObserver();
+        setupSearch();
 
         getSupportFragmentManager().setFragmentResultListener(
                 CreateTaskBottomSheet.REQUEST_KEY,
@@ -134,10 +144,47 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         });
 
         chipAllTask.setOnClickListener(v -> {
+            etSearch.setText(""); // Очистить поиск при выборе "All Task"
             viewModel.loadTasks(MainViewModel.ALL_CATEGORIES_ID);
             updateChipSelection(chipAllTask);
         });
     }
+
+    private void setupSearch() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String searchText = s.toString().trim();
+                viewModel.setSearchQuery(searchText.isEmpty() ? MainViewModel.NO_SEARCH : searchText);
+
+                if (searchText.isEmpty()) {
+                    chipScrollView.setVisibility(View.VISIBLE);
+                    if (!isAnyChipChecked()) {
+                        chipAllTask.setChecked(true);
+                        viewModel.loadTasks(MainViewModel.ALL_CATEGORIES_ID);
+                    }
+                } else {
+                    chipScrollView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+    }
+
+    private boolean isAnyChipChecked() {
+        for (Chip chip : categoryChips) {
+            if (chip.isChecked()) {
+                return true;
+            }
+        }
+        return chipAllTask.isChecked();
+    }
+
 
     @Override
     protected void onResume() {
@@ -165,26 +212,43 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
                 addCategoryChip(category);
             }
 
-            boolean isAnyCategoryChipChecked = false;
-            for (Chip chip : categoryChips) {
-                if (chip.isChecked()) {
-                    isAnyCategoryChipChecked = true;
-                    break;
-                }
-            }
-            if (!isAnyCategoryChipChecked && chipAllTask != null && !chipAllTask.isChecked()) {
-                chipAllTask.setChecked(true);
-                viewModel.loadTasks(MainViewModel.ALL_CATEGORIES_ID);
+            if (etSearch.getText().toString().trim().isEmpty()) {
+                restoreChipSelectionState();
+            } else {
+                updateChipSelection(null);
             }
         });
     }
 
+    private void restoreChipSelectionState() {
+        boolean isAnyCategoryChecked = false;
+        for (Chip chip : categoryChips) {
+            if (chip.isChecked()) {
+                isAnyCategoryChecked = true;
+                break;
+            }
+        }
+        chipAllTask.setChecked(!isAnyCategoryChecked);
+    }
 
+
+    @SuppressLint("SetTextI18n")
     private void setupTaskObserver() {
         viewModel.getTasks().observe(this, tasks -> {
+            boolean isSearching = !etSearch.getText().toString().trim().isEmpty();
             if (tasks == null || tasks.isEmpty()) {
                 rvTasks.setVisibility(View.GONE);
                 emptyStateLayout.setVisibility(View.VISIBLE);
+                TextView tvEmptyTitle = findViewById(R.id.tvEmptyTitle);
+                TextView tvEmptySubtitle = findViewById(R.id.tvEmptySubtitle);
+                if (isSearching) {
+                    tvEmptyTitle.setText("Nothing found");
+                    tvEmptySubtitle.setText("Try a different search term");
+                } else {
+                    tvEmptyTitle.setText(R.string.empty_taskbox);
+                    tvEmptySubtitle.setText(R.string.empty_taskbox_hint);
+                }
+
             } else {
                 rvTasks.setVisibility(View.VISIBLE);
                 emptyStateLayout.setVisibility(View.GONE);
@@ -202,10 +266,18 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-
-                if (positionStart == 0) {
+                if (positionStart == 0 && etSearch.getText().toString().trim().isEmpty()) {
                     rvTasks.scrollToPosition(0);
                 }
+            }
+            @Override
+            public void onItemRangeChanged(int positionStart, int itemCount) {
+                super.onItemRangeChanged(positionStart, itemCount);
+            }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                super.onItemRangeRemoved(positionStart, itemCount);
             }
         });
     }
@@ -220,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
 
         Chip newChip = (Chip) inflater.inflate(R.layout.chip_category, chipContainer, false);
         newChip.setText(category.name);
+        newChip.setTag(category.id);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -230,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         newChip.setLayoutParams(params);
 
         newChip.setOnClickListener(v -> {
+            etSearch.setText("");
             viewModel.loadTasks(category.id);
             updateChipSelection(newChip);
         });
@@ -252,6 +326,8 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         }
         if (selectedChip != null && !selectedChip.isChecked()) {
             selectedChip.setChecked(true);
+        } else if (selectedChip == null && chipAllTask != null) {
+            chipAllTask.setChecked(false);
         }
     }
 

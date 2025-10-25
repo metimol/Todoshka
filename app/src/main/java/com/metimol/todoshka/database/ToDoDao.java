@@ -46,6 +46,9 @@ public interface ToDoDao {
     @Query("SELECT * FROM todos WHERE id = :taskId LIMIT 1")
     LiveData<ToDo> getTodoById(int taskId);
 
+    @Query("SELECT * FROM todos WHERE text LIKE '%' || :searchText || '%' ORDER BY isCompleted ASC, id DESC")
+    LiveData<List<ToDo>> searchTodos(String searchText);
+
 
     // --- UPDATE ---
     @Update

@@ -29,6 +29,10 @@ public class ToDoRepository {
         return toDoDao.getTodoById(taskId);
     }
 
+    public LiveData<List<ToDo>> searchTodos(String searchText) {
+        return toDoDao.searchTodos(searchText);
+    }
+
     public void update(ToDo toDo) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             toDoDao.updateToDo(toDo);

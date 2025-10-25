@@ -5,50 +5,81 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 import com.metimol.todoshka.database.ToDo;
 import java.util.List;
+import java.util.Objects;
 
 public class MainViewModel extends AndroidViewModel {
     private final ToDoRepository repository;
 
     private final MediatorLiveData<List<ToDo>> tasksLiveData = new MediatorLiveData<>();
 
-    private LiveData<List<ToDo>> allTasksSource;
-    private LiveData<List<ToDo>> categoryTasksSource;
+    private final MutableLiveData<String> searchQuery = new MutableLiveData<>();
+
+    private final MutableLiveData<Integer> currentCategoryId = new MutableLiveData<>(ALL_CATEGORIES_ID);
+
+    private LiveData<List<ToDo>> currentSource;
 
     public static final int ALL_CATEGORIES_ID = -1;
-    private int currentCategoryId = ALL_CATEGORIES_ID;
+    public static final String NO_SEARCH = null;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         repository = new ToDoRepository(application);
-        loadTasks(currentCategoryId);
+
+        tasksLiveData.addSource(currentCategoryId, categoryId -> updateDataSource());
+        tasksLiveData.addSource(searchQuery, query -> updateDataSource());
+
+        searchQuery.setValue(NO_SEARCH);
     }
 
     public LiveData<List<ToDo>> getTasks() {
         return tasksLiveData;
     }
 
-    public void loadTasks(int categoryId) {
-        currentCategoryId = categoryId;
+    private void updateDataSource() {
+        String query = searchQuery.getValue();
+        Integer categoryId = currentCategoryId.getValue();
 
-        if (categoryTasksSource != null) {
-            tasksLiveData.removeSource(categoryTasksSource);
-            categoryTasksSource = null;
+        if (query != null && !query.isEmpty()) {
+            switchToNewSource(repository.searchTodos(query));
         }
-        if (allTasksSource != null) {
-            tasksLiveData.removeSource(allTasksSource);
-            allTasksSource = null;
-        }
-
-        if (categoryId == ALL_CATEGORIES_ID) {
-            allTasksSource = repository.getAllTodos();
-            tasksLiveData.addSource(allTasksSource, tasksLiveData::setValue);
-        } else {
-            categoryTasksSource = repository.getTodosForCategory(categoryId);
-            tasksLiveData.addSource(categoryTasksSource, tasksLiveData::setValue);
+        else if (categoryId != null) {
+            if (categoryId == ALL_CATEGORIES_ID) {
+                switchToNewSource(repository.getAllTodos());
+            } else {
+                switchToNewSource(repository.getTodosForCategory(categoryId));
+            }
         }
     }
+
+    private void switchToNewSource(LiveData<List<ToDo>> newSource) {
+        if (currentSource != null) {
+            tasksLiveData.removeSource(currentSource);
+        }
+        currentSource = newSource;
+        tasksLiveData.addSource(currentSource, tasksLiveData::setValue);
+    }
+
+    public void setSearchQuery(String query) {
+        if (query != null && !query.isEmpty()) {
+            currentCategoryId.setValue(ALL_CATEGORIES_ID);
+        }
+        if (!Objects.equals(searchQuery.getValue(), query)) {
+            searchQuery.setValue(query);
+        }
+    }
+
+    public void loadTasks(int categoryId) {
+        if (!Objects.equals(searchQuery.getValue(), NO_SEARCH)) {
+            searchQuery.setValue(NO_SEARCH);
+        }
+        if (!Objects.equals(currentCategoryId.getValue(), categoryId)) {
+            currentCategoryId.setValue(categoryId);
+        }
+    }
+
 
     public LiveData<ToDo> getTodoById(int taskId) {
         return repository.getTodoById(taskId);
