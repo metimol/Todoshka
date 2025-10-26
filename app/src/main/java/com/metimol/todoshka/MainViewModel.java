@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.metimol.todoshka.database.Category;
+import com.metimol.todoshka.database.CategoryInfo;
 import com.metimol.todoshka.database.ToDo;
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +16,7 @@ public class MainViewModel extends AndroidViewModel {
     private final ToDoRepository repository;
 
     private final MediatorLiveData<List<ToDo>> tasksLiveData = new MediatorLiveData<>();
-    private final LiveData<List<Category>> categoriesLiveData;
+    private final LiveData<List<CategoryInfo>> categoriesWithCountsLiveData;
 
     private final MutableLiveData<String> searchQuery = new MutableLiveData<>();
     private final MutableLiveData<Integer> currentCategoryId = new MutableLiveData<>(ALL_CATEGORIES_ID);
@@ -28,7 +29,7 @@ public class MainViewModel extends AndroidViewModel {
     public MainViewModel(@NonNull Application application) {
         super(application);
         repository = new ToDoRepository(application);
-        categoriesLiveData = repository.getAllCategoriesLiveData();
+        categoriesWithCountsLiveData = repository.getAllCategoriesWithCountsLiveData();
 
         tasksLiveData.addSource(currentCategoryId, categoryId -> updateDataSource());
         tasksLiveData.addSource(searchQuery, query -> updateDataSource());
@@ -40,8 +41,12 @@ public class MainViewModel extends AndroidViewModel {
         return tasksLiveData;
     }
 
+    public LiveData<List<CategoryInfo>> getCategoriesWithCounts() {
+        return categoriesWithCountsLiveData;
+    }
+
     public LiveData<List<Category>> getCategories() {
-        return categoriesLiveData;
+        return repository.getAllCategoriesLiveData();
     }
 
     private void updateDataSource() {
@@ -58,9 +63,7 @@ public class MainViewModel extends AndroidViewModel {
                 switchToNewSource(repository.getTodosForCategory(categoryId));
             }
         } else {
-            if (currentSource == null) {
-                switchToNewSource(repository.getAllTodos());
-            }
+            switchToNewSource(repository.getAllTodos());
         }
     }
 
@@ -82,6 +85,10 @@ public class MainViewModel extends AndroidViewModel {
         }
         if (!Objects.equals(searchQuery.getValue(), query)) {
             searchQuery.setValue(query);
+        } else if (query == null || query.isEmpty()){
+            if (!Objects.equals(currentCategoryId.getValue(), ALL_CATEGORIES_ID)) {
+                updateDataSource();
+            }
         }
     }
 
@@ -92,7 +99,7 @@ public class MainViewModel extends AndroidViewModel {
         }
         if (!Objects.equals(currentCategoryId.getValue(), categoryId)) {
             currentCategoryId.setValue(categoryId);
-        } else if (searchQuery.getValue() == NO_SEARCH && currentSource == null) {
+        } else {
             updateDataSource();
         }
     }

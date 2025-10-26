@@ -142,7 +142,7 @@ public class CreateTaskBottomSheet extends BottomSheetDialogFragment {
     @SuppressLint("SetTextI18n")
     private void loadCategories() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            categories = toDoDao.getAllCategories();
+            categories = toDoDao.getAllCategoriesInternal();
 
             requireActivity().runOnUiThread(() -> {
                 if (categories != null && !categories.isEmpty()) {

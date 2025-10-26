@@ -89,7 +89,7 @@ public class CreateCategoryBottomSheet extends BottomSheetDialogFragment {
             etNewCategory.setError("Category cannot be empty");
         } else {
             AppDatabase.databaseWriteExecutor.execute(() -> {
-                List<Category> categories = toDoDao.getAllCategories();
+                List<Category> categories = toDoDao.getAllCategoriesInternal();
                 Category category = new Category();
 
                 category.name = categoryName;

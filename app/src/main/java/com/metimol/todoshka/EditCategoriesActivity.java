@@ -1,8 +1,11 @@
 package com.metimol.todoshka;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -10,6 +13,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.metimol.todoshka.database.Category;
 
 public class EditCategoriesActivity extends AppCompatActivity {
 
@@ -54,21 +59,21 @@ public class EditCategoriesActivity extends AppCompatActivity {
         rvCategories.setLayoutManager(new LinearLayoutManager(this));
         rvCategories.setAdapter(categoryAdapter);
 
-        categoryAdapter.setOnCategorySettingsClickListener((category, anchorView) -> {
-            android.widget.Toast.makeText(this, "Settings for: " + category.name, android.widget.Toast.LENGTH_SHORT).show();
-        });
+        categoryAdapter.setOnCategorySettingsClickListener(this::showCategoryPopupMenu);
     }
 
     private void observeCategories() {
-        // Observe the LiveData from the ViewModel
-        viewModel.getCategories().observe(this, categories -> {
-            if (categories != null) {
-                categoryAdapter.submitList(categories);
-                rvCategories.setVisibility(categories.isEmpty() ? android.view.View.GONE : android.view.View.VISIBLE);
+        viewModel.getCategoriesWithCounts().observe(this, categoryInfos -> {
+            if (categoryInfos != null) {
+                categoryAdapter.submitList(categoryInfos);
+                rvCategories.setVisibility(categoryInfos.isEmpty() ? View.GONE : View.VISIBLE);
             }
         });
     }
 
+    private void showCategoryPopupMenu(Category category, View anchorView) {
+        Log.d("PopupMenu", "Showing popup menu for category: " + category.name);
+    }
 
     private void createCategory() {
         CreateCategoryBottomSheet bottomSheet = new CreateCategoryBottomSheet();
