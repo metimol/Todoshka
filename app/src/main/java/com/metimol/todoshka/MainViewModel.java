@@ -111,4 +111,8 @@ public class MainViewModel extends AndroidViewModel {
     public void deleteTodo(ToDo toDo) {
         repository.delete(toDo);
     }
+
+    public void deleteCategory(Category category) {
+        repository.deleteCategory(category);
+    }
 }

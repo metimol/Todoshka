@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 
 public class TaskInfoActivity extends AppCompatActivity implements ConfirmDeleteDialog.ConfirmDeleteListener {
-
     public static final String EXTRA_TASK = "com.metimol.todoshka.TASK";
     private static final String TAG = "TaskInfoActivity";
     private final ExecutorService databaseWriteExecutor = AppDatabase.databaseWriteExecutor;
@@ -146,5 +145,10 @@ public class TaskInfoActivity extends AppCompatActivity implements ConfirmDelete
     public void onDeleteConfirmed(ToDo task) {
         viewModel.deleteTodo(task);
         finish();
+    }
+
+    @Override
+    public void onDeleteConfirmed(Category category) {
+        // Not used in this activity
     }
 }

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/rectangle_stroke_background"
     android:backgroundTint="@color/asphalt_base"
-    android:padding="30dp">
+    android:padding="15dp">
 
     <LinearLayout
         android:id="@+id/action_delete_category"
@@ -19,9 +19,9 @@
         tools:ignore="UseCompoundDrawables">
 
         <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="20dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="10dp"
             android:src="@drawable/ic_delete" />
 
         <TextView
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:text="@string/delete"
             android:textColor="@color/blast_red"
-            android:textSize="30sp" />
+            android:textSize="15sp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

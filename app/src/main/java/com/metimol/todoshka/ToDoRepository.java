@@ -95,6 +95,12 @@ public class ToDoRepository {
         });
     }
 
+    public void deleteCategory(Category category) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            toDoDao.deleteCategory(category);
+        });
+    }
+
     public LiveData<List<Category>> getAllCategoriesLiveData() {
         return allCategories;
     }

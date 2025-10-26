@@ -8,26 +8,39 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.button.MaterialButton;
+import com.metimol.todoshka.database.Category;
 import com.metimol.todoshka.database.ToDo;
 
 public class ConfirmDeleteDialog extends DialogFragment {
 
     public static final String TAG = "ConfirmDeleteDialog";
+    private static final String ARG_CATEGORY = "category_to_delete";
     private static final String ARG_TASK = "task_to_delete";
 
+    private Category categoryToDelete;
     private ToDo taskToDelete;
 
     public interface ConfirmDeleteListener {
+        void onDeleteConfirmed(Category category);
         void onDeleteConfirmed(ToDo task);
     }
 
     private ConfirmDeleteListener listener;
+
+    public static ConfirmDeleteDialog newInstance(Category category) {
+        ConfirmDeleteDialog fragment = new ConfirmDeleteDialog();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_CATEGORY, category);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public static ConfirmDeleteDialog newInstance(ToDo task) {
         ConfirmDeleteDialog fragment = new ConfirmDeleteDialog();
@@ -41,14 +54,19 @@ public class ConfirmDeleteDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            taskToDelete = getArguments().getParcelable(ARG_TASK);
+            if (getArguments().containsKey(ARG_CATEGORY)) {
+                categoryToDelete = getArguments().getParcelable(ARG_CATEGORY);
+            } else if (getArguments().containsKey(ARG_TASK)) {
+                taskToDelete = getArguments().getParcelable(ARG_TASK);
+            }
         }
 
-        try {
+        if (getParentFragment() instanceof ConfirmDeleteListener) {
+            listener = (ConfirmDeleteListener) getParentFragment();
+        } else if (getActivity() instanceof ConfirmDeleteListener) {
             listener = (ConfirmDeleteListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(getActivity().toString()
-                    + " must implement ConfirmDeleteListener");
+        } else {
+            throw new ClassCastException("Calling context must implement ConfirmDeleteListener");
         }
     }
 
@@ -68,12 +86,26 @@ public class ConfirmDeleteDialog extends DialogFragment {
 
         MaterialButton btnCancel = view.findViewById(R.id.btnCancel);
         MaterialButton btnDelete = view.findViewById(R.id.btnDelete);
+        TextView tvTitle = view.findViewById(R.id.tvAreYouSure);
+        TextView tvHint = view.findViewById(R.id.tvHint);
+
+        if (categoryToDelete != null) {
+            tvTitle.setText(R.string.are_you_sure_category);
+            tvHint.setText(R.string.delete_category_confirmation);
+        } else {
+            tvTitle.setText(R.string.are_you_sure);
+            tvHint.setText(R.string.do_you_really_want_to_delete_this_task_this_process_can_t_be_undone);
+        }
 
         btnCancel.setOnClickListener(v -> dismiss());
 
         btnDelete.setOnClickListener(v -> {
-            if (listener != null && taskToDelete != null) {
-                listener.onDeleteConfirmed(taskToDelete);
+            if (listener != null) {
+                if (categoryToDelete != null) {
+                    listener.onDeleteConfirmed(categoryToDelete);
+                } else if (taskToDelete != null) {
+                    listener.onDeleteConfirmed(taskToDelete);
+                }
             }
             dismiss();
         });

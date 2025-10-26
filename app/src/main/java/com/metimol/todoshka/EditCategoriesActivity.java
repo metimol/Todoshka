@@ -1,10 +1,16 @@
 package com.metimol.todoshka;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -15,12 +21,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.metimol.todoshka.database.Category;
+import com.metimol.todoshka.database.ToDo;
 
-public class EditCategoriesActivity extends AppCompatActivity {
+public class EditCategoriesActivity extends AppCompatActivity implements ConfirmDeleteDialog.ConfirmDeleteListener {
 
     private MainViewModel viewModel;
     private CategoryAdapter categoryAdapter;
     private RecyclerView rvCategories;
+    private PopupWindow popupWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +80,50 @@ public class EditCategoriesActivity extends AppCompatActivity {
     }
 
     private void showCategoryPopupMenu(Category category, View anchorView) {
-        Log.d("PopupMenu", "Showing popup menu for category: " + category.name);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        @SuppressLint("InflateParams") View popupView = inflater.inflate(R.layout.item_category_settings, null);
+
+        popupWindow = new PopupWindow(
+                popupView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                true
+        );
+
+        popupWindow.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setElevation(10f);
+
+        LinearLayout deleteAction = popupView.findViewById(R.id.action_delete_category);
+        deleteAction.setOnClickListener(v -> {
+            popupWindow.dismiss();
+            showConfirmDeleteDialog(category);
+        });
+
+        int xOffset = -popupView.getWidth() - 150;
+        int yOffset = -anchorView.getHeight();
+
+        popupWindow.showAsDropDown(anchorView, xOffset, yOffset);
     }
 
     private void createCategory() {
         CreateCategoryBottomSheet bottomSheet = new CreateCategoryBottomSheet();
         bottomSheet.show(getSupportFragmentManager(), CreateCategoryBottomSheet.TAG);
+    }
+
+    private void showConfirmDeleteDialog(Category category) {
+        ConfirmDeleteDialog dialog = ConfirmDeleteDialog.newInstance(category);
+        dialog.show(getSupportFragmentManager(), ConfirmDeleteDialog.TAG);
+    }
+
+    @Override
+    public void onDeleteConfirmed(Category category) {
+        Log.d("EditCategoriesActivity", "Deletion confirmed for category: " + category.name);
+        viewModel.deleteCategory(category);
+    }
+
+    @Override
+    public void onDeleteConfirmed(ToDo task) {
+        // Not used in this activity
     }
 }
