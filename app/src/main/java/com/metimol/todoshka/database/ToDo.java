@@ -29,8 +29,6 @@ public class ToDo implements Parcelable {
 
     public ToDo() {}
 
-    // --- Parcelable implementation ---
-
     protected ToDo(Parcel in) {
         id = in.readInt();
         text = in.readString();

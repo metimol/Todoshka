@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         });
 
         chipAllTask.setOnClickListener(v -> {
-            etSearch.setText(""); // Очистить поиск при выборе "All Task"
+            etSearch.setText("");
             viewModel.loadTasks(MainViewModel.ALL_CATEGORIES_ID);
             updateChipSelection(chipAllTask);
         });

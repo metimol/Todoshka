@@ -96,7 +96,7 @@ public class ToDoRepository {
     }
 
     public LiveData<List<Category>> getAllCategoriesLiveData() {
-        return allCategories; // Return original if needed
+        return allCategories;
     }
 
     public LiveData<List<CategoryInfo>> getAllCategoriesWithCountsLiveData() {
