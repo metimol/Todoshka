@@ -112,6 +112,10 @@ public class MainViewModel extends AndroidViewModel {
         repository.delete(toDo);
     }
 
+    public void updateCategoriesOrder(List<Category> categories) {
+        repository.updateCategoriesOrder(categories);
+    }
+
     public void deleteCategory(Category category) {
         repository.deleteCategory(category);
     }

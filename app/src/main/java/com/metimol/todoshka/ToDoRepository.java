@@ -11,18 +11,21 @@ import com.metimol.todoshka.database.ToDoDao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class ToDoRepository {
     private final ToDoDao toDoDao;
     private final LiveData<List<ToDo>> allTodos;
     private final LiveData<List<Category>> allCategories;
     private final LiveData<List<CategoryInfo>> allCategoriesWithCounts;
+    private final ExecutorService databaseWriteExecutor;
 
     public ToDoRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         toDoDao = db.toDoDao();
         allTodos = toDoDao.getAllTodosLiveData();
         allCategories = toDoDao.getAllCategoriesLiveData();
+        databaseWriteExecutor = AppDatabase.databaseWriteExecutor;
 
         MediatorLiveData<List<CategoryInfo>> categoriesWithCountsMediator = new MediatorLiveData<>();
 
@@ -92,6 +95,15 @@ public class ToDoRepository {
     public void delete(ToDo toDo) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             toDoDao.deleteToDo(toDo);
+        });
+    }
+
+    public void updateCategoriesOrder(List<Category> categories) {
+        databaseWriteExecutor.execute(() -> {
+            for (int i = 0; i < categories.size(); i++) {
+                categories.get(i).position = i + 1;
+            }
+            toDoDao.updateCategories(categories);
         });
     }
 

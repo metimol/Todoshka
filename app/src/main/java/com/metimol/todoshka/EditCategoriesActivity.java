@@ -12,23 +12,33 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.metimol.todoshka.database.Category;
 import com.metimol.todoshka.database.ToDo;
 
-public class EditCategoriesActivity extends AppCompatActivity implements ConfirmDeleteDialog.ConfirmDeleteListener {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class EditCategoriesActivity extends AppCompatActivity implements
+        ConfirmDeleteDialog.ConfirmDeleteListener, CategoryAdapter.OnStartDragListener {
+
+    private static final String TAG = "EditCategoriesActivity";
 
     private MainViewModel viewModel;
     private CategoryAdapter categoryAdapter;
     private RecyclerView rvCategories;
     private PopupWindow popupWindow;
+    private ItemTouchHelper itemTouchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,20 +54,20 @@ public class EditCategoriesActivity extends AppCompatActivity implements Confirm
 
         setupRecyclerView();
         observeCategories();
+        setupItemTouchHelper();
 
         ivBack.setOnClickListener(v -> finish());
         llAddCategory.setOnClickListener(v -> createCategory());
-        ivDone.setOnClickListener(v -> finish());
+        ivDone.setOnClickListener(v -> {
+            Log.d(TAG, "Done button clicked.");
+            saveCategoryOrder();
+            finish();
+        });
 
         var editCategoriesLayout = findViewById(R.id.edit_categories_activity_screen);
         ViewCompat.setOnApplyWindowInsetsListener(editCategoriesLayout, (view, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(
-                    systemBars.left,
-                    systemBars.top,
-                    systemBars.right,
-                    systemBars.bottom
-            );
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return WindowInsetsCompat.CONSUMED;
         });
     }
@@ -66,30 +76,98 @@ public class EditCategoriesActivity extends AppCompatActivity implements Confirm
         categoryAdapter = new CategoryAdapter();
         rvCategories.setLayoutManager(new LinearLayoutManager(this));
         rvCategories.setAdapter(categoryAdapter);
-
         categoryAdapter.setOnCategorySettingsClickListener(this::showCategoryPopupMenu);
+        categoryAdapter.setOnStartDragListener(this);
+    }
+
+    private void setupItemTouchHelper() {
+        ItemTouchHelper.Callback callback = new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                int fromPosition = viewHolder.getAdapterPosition();
+                int toPosition = target.getAdapterPosition();
+                if (fromPosition == RecyclerView.NO_POSITION || toPosition == RecyclerView.NO_POSITION) {
+                    return false;
+                }
+                Log.d(TAG, "ItemTouchHelper onMove from " + fromPosition + " to " + toPosition);
+                categoryAdapter.onItemMove(fromPosition, toPosition);
+                return true;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) { }
+
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                Log.d(TAG, "ItemTouchHelper clearView (drag finished). Current adapter list might reflect the drag.");
+            }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return false;
+            }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return false;
+            }
+        };
+
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(rvCategories);
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        Log.d(TAG, "onStartDrag called for position: " + viewHolder.getAdapterPosition());
+        if (itemTouchHelper != null) {
+            itemTouchHelper.startDrag(viewHolder);
+        }
     }
 
     private void observeCategories() {
         viewModel.getCategoriesWithCounts().observe(this, categoryInfos -> {
             if (categoryInfos != null) {
+                String orderLog = categoryInfos.stream()
+                        .map(info -> info.category.name + "(pos:" + info.category.position + ")")
+                        .collect(Collectors.joining(", "));
+                Log.d(TAG, "observeCategories: Received list from DB (" + categoryInfos.size() + "): " + orderLog);
+
                 categoryAdapter.submitList(categoryInfos);
                 rvCategories.setVisibility(categoryInfos.isEmpty() ? View.GONE : View.VISIBLE);
+            } else {
+                Log.d(TAG, "observeCategories: Received null list from DB.");
+                categoryAdapter.submitList(new ArrayList<>());
+                rvCategories.setVisibility(View.GONE);
             }
         });
     }
 
+    private void saveCategoryOrder() {
+        List<Category> updatedCategories = categoryAdapter.getCurrentCategoryList();
+        if (updatedCategories != null && !updatedCategories.isEmpty()) {
+            String orderLog = updatedCategories.stream()
+                    .map(cat -> cat.name + "(id:" + cat.id + ")")
+                    .collect(Collectors.joining(", "));
+            Log.d(TAG, "saveCategoryOrder: Saving list (" + updatedCategories.size() + "): " + orderLog);
+
+            viewModel.updateCategoriesOrder(updatedCategories);
+        } else {
+            Log.d(TAG, "saveCategoryOrder: Adapter list is empty, nothing to save.");
+        }
+    }
+
     private void showCategoryPopupMenu(Category category, View anchorView) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        @SuppressLint("InflateParams") View popupView = inflater.inflate(R.layout.item_category_settings, null);
+        @SuppressLint("InflateParams")
+        View popupView = inflater.inflate(R.layout.item_category_settings, null);
 
-        popupWindow = new PopupWindow(
-                popupView,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                true
-        );
-
+        popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         popupWindow.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         popupWindow.setOutsideTouchable(true);
         popupWindow.setElevation(10f);
@@ -100,8 +178,10 @@ public class EditCategoriesActivity extends AppCompatActivity implements Confirm
             showConfirmDeleteDialog(category);
         });
 
-        int xOffset = -popupView.getWidth() - 150;
-        int yOffset = -anchorView.getHeight();
+        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        int popupWidth = popupView.getMeasuredWidth();
+        int xOffset = -popupWidth - (int) Utils.dpToPx(this, 10);
+        int yOffset = -anchorView.getHeight() / 2 - popupView.getMeasuredHeight() / 2;
 
         popupWindow.showAsDropDown(anchorView, xOffset, yOffset);
     }
@@ -118,12 +198,17 @@ public class EditCategoriesActivity extends AppCompatActivity implements Confirm
 
     @Override
     public void onDeleteConfirmed(Category category) {
-        Log.d("EditCategoriesActivity", "Deletion confirmed for category: " + category.name);
+        Log.d(TAG, "onDeleteConfirmed for category: " + category.name);
         viewModel.deleteCategory(category);
     }
 
     @Override
-    public void onDeleteConfirmed(ToDo task) {
-        // Not used in this activity
+    public void onDeleteConfirmed(ToDo task) { }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause called, attempting to save category order.");
+        saveCategoryOrder();
     }
 }
