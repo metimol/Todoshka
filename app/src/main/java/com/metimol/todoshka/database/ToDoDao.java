@@ -5,10 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Transaction;
 import androidx.room.Update;
-
-import com.metimol.todoshka.database.relations.CategoryWithTodos;
 
 import java.util.List;
 
@@ -33,20 +30,13 @@ public interface ToDoDao {
     @Query("SELECT * FROM categories WHERE id = :categoryId LIMIT 1")
     Category getCategoryById(int categoryId);
 
-    @Transaction
-    @Query("SELECT * FROM categories")
-    public List<CategoryWithTodos> getCategoriesWithTodos();
-
-    @Query("SELECT * FROM todos ORDER BY isCompleted ASC, id DESC")
+    @Query("SELECT * FROM todos ORDER BY isCompleted ASC, creation_date DESC, id DESC")
     LiveData<List<ToDo>> getAllTodosLiveData();
 
-    @Query("SELECT * FROM todos WHERE categoryId = :categoryId ORDER BY isCompleted ASC, id DESC")
+    @Query("SELECT * FROM todos WHERE categoryId = :categoryId ORDER BY isCompleted ASC, creation_date DESC, id DESC")
     LiveData<List<ToDo>> getTodosForCategoryLiveData(int categoryId);
 
-    @Query("SELECT * FROM todos WHERE id = :taskId LIMIT 1")
-    LiveData<ToDo> getTodoById(int taskId);
-
-    @Query("SELECT * FROM todos WHERE text LIKE '%' || :searchText || '%' ORDER BY isCompleted ASC, id DESC")
+    @Query("SELECT * FROM todos WHERE text LIKE :searchText ORDER BY isCompleted ASC, creation_date DESC, id DESC")
     LiveData<List<ToDo>> searchTodos(String searchText);
 
 
@@ -56,9 +46,6 @@ public interface ToDoDao {
 
 
     // --- DELETE ---
-    @Delete
-    void deleteCategory(Category category);
-
     @Delete
     void deleteToDo(ToDo todo);
 }

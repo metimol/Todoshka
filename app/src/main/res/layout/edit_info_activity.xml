@@ -37,7 +37,7 @@
         app:tint="@color/white" />
 
     <TextView
-        android:id="@+id/tvNameLabel"
+        android:id="@+id/tvLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -67,7 +67,7 @@
         tools:text="Metimol"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvNameLabel" />
+        app:layout_constraintTop_toBottomOf="@id/tvLabel" />
 
     <TextView
         android:id="@+id/tvCharacterLabel"

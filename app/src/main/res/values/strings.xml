@@ -39,7 +39,7 @@
     <string name="input_category_name_here">Input Category name here...</string>
     <string name="add_new_category">Add New Category</string>
     <string name="category">Category</string>
-    <string name="delete">delete</string>
+    <string name="delete">Delete</string>
     <string name="date">Date</string>
     <string name="priority">Priority</string>
     <string name="priority_icon">priority icon</string>
@@ -47,4 +47,9 @@
     <string name="do_you_really_want_to_delete_this_task_this_process_can_t_be_undone">Do you really want to delete this task?\nthis process can\'t be undone.</string>
     <string name="cancel">Cancel</string>
     <string name="delete_button">Delete</string>
+    <string name="edit_categories">Edit Categories</string>
+    <string name="manage_categories">Manage Categories</string>
+    <string name="you_can_change_remove_and_create_categories">You can change, remove and create Categories.</string>
+    <string name="create_new_category">Create new Category</string>
+    <string name="edit">Edit</string>
 </resources>

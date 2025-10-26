@@ -35,7 +35,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         ImageView ivBack = findViewById(R.id.ivBack);
         tvUserName = findViewById(R.id.tvUserName);
-        ConstraintLayout clEditName = findViewById(R.id.clEditName);
+        ConstraintLayout clEditInfo = findViewById(R.id.clEditInfo);
+        ConstraintLayout clEditCategories = findViewById(R.id.clEditCategories);
         LinearLayout rateUsButton = findViewById(R.id.rateUsButton);
         LinearLayout shareButton = findViewById(R.id.shareButton);
         ivAvatar = findViewById(R.id.ivAvatar);
@@ -47,8 +48,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         ivBack.setOnClickListener(v -> finish());
 
-        clEditName.setOnClickListener(v -> {
+        clEditInfo.setOnClickListener(v -> {
             Intent intent = new Intent(this, EditInfoActivity.class);
+            startActivity(intent);
+        });
+
+        clEditCategories.setOnClickListener(v -> {
+            Intent intent = new Intent(this, EditCategoriesActivity.class);
             startActivity(intent);
         });
 

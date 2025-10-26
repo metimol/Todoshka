@@ -3,6 +3,7 @@ package com.metimol.todoshka;
 import android.app.Application;
 import androidx.lifecycle.LiveData;
 import com.metimol.todoshka.database.AppDatabase;
+import com.metimol.todoshka.database.Category;
 import com.metimol.todoshka.database.ToDo;
 import com.metimol.todoshka.database.ToDoDao;
 import java.util.List;
@@ -10,11 +11,13 @@ import java.util.List;
 public class ToDoRepository {
     private final ToDoDao toDoDao;
     private final LiveData<List<ToDo>> allTodos;
+    private final LiveData<List<Category>> allCategories;
 
     public ToDoRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         toDoDao = db.toDoDao();
         allTodos = toDoDao.getAllTodosLiveData();
+        allCategories = toDoDao.getAllCategoriesLiveData();
     }
 
     public LiveData<List<ToDo>> getAllTodos() {
@@ -25,12 +28,8 @@ public class ToDoRepository {
         return toDoDao.getTodosForCategoryLiveData(categoryId);
     }
 
-    public LiveData<ToDo> getTodoById(int taskId) {
-        return toDoDao.getTodoById(taskId);
-    }
-
     public LiveData<List<ToDo>> searchTodos(String searchText) {
-        return toDoDao.searchTodos(searchText);
+        return toDoDao.searchTodos("%" + searchText + "%");
     }
 
     public void update(ToDo toDo) {
@@ -43,5 +42,9 @@ public class ToDoRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             toDoDao.deleteToDo(toDo);
         });
+    }
+
+    public LiveData<List<Category>> getAllCategoriesLiveData() {
+        return allCategories;
     }
 }
