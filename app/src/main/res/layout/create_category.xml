@@ -18,7 +18,7 @@
         android:backgroundTint="@color/deep_dark"
         android:gravity="top|start"
         android:hint="@string/input_category_name_here"
-        android:inputType="text"
+        android:inputType="textCapSentences"
         android:maxLength="15"
         android:maxLines="1"
         android:padding="16dp"
