@@ -7,6 +7,8 @@
     <string name="all_task">All Task</string>
     <string name="empty_taskbox">Your task box is empty.</string>
     <string name="add_task">Add Task</string>
+    <string name="nothing_found">Nothing found</string>
+    <string name="try_different_search">Try a different search term</string>
     <string name="empty_taskbox_hint">Once you create new task you\'ll\nsee it listed here</string>
     <string name="what_name">What is Your Name ?</string>
     <string name="what_name_hint">Please provide your name, which we\'ll use for display and personalize your to-do experience.</string>
@@ -48,4 +50,5 @@
     <string name="create_new_category">Create new Category</string>
     <string name="are_you_sure_category">Are You Sure?</string>
     <string name="delete_category_confirmation">Do you really want to delete this category and all related tasks? This process can\'t be undone.</string>
+    <string name="losung">Just Your Tasks.\nNo Clutter.</string>
 </resources>

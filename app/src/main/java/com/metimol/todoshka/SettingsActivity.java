@@ -42,7 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
         ivAvatar = findViewById(R.id.ivAvatar);
         TextView tvVersion = findViewById(R.id.tvVersion);
 
-        sharedPreferences = getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(GetStartedActivity.PREFS_NAME, Context.MODE_PRIVATE);
 
         loadAndSetUserInfo();
 

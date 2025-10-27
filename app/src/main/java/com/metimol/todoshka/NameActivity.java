@@ -8,6 +8,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -22,9 +25,9 @@ public class NameActivity extends AppCompatActivity {
         setContentView(R.layout.name_activity);
 
         etName = findViewById(R.id.etName);
-        MaterialButton btnGetStarted = findViewById(R.id.btnGetStarted);
+        MaterialButton btnSaveName = findViewById(R.id.btnGetStarted);
 
-        sharedPreferences = getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(GetStartedActivity.PREFS_NAME, Context.MODE_PRIVATE);
 
         if (sharedPreferences.contains(MainActivity.USER_NAME_KEY)) {
             String currentName = sharedPreferences.getString(MainActivity.USER_NAME_KEY, "");
@@ -32,22 +35,22 @@ public class NameActivity extends AppCompatActivity {
             etName.setSelection(currentName.length());
         }
 
-        btnGetStarted.setOnClickListener(v -> {
+        btnSaveName.setOnClickListener(v -> {
             String name = etName.getText().toString().trim();
 
             if (isValidName(name)) {
-                saveName(name);
-
-                if (isTaskRoot()) {
-                    Intent intent = new Intent(NameActivity.this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                }
-                finish();
-
+                saveNameAndMarkFirstLaunchComplete(name);
+                launchMainActivity();
             } else {
                 Toast.makeText(NameActivity.this, "The name must contain at least 5 letters", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        var nameLayout = findViewById(R.id.name_activity_screen);
+        ViewCompat.setOnApplyWindowInsetsListener(nameLayout, (view, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return WindowInsetsCompat.CONSUMED;
         });
     }
 
@@ -55,9 +58,17 @@ public class NameActivity extends AppCompatActivity {
         return name != null && name.length() >= 5;
     }
 
-    private void saveName(String name) {
+    private void saveNameAndMarkFirstLaunchComplete(String name) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(MainActivity.USER_NAME_KEY, name);
+        editor.putBoolean(GetStartedActivity.IS_FIRST_LAUNCH_KEY, false);
         editor.apply();
+    }
+
+    private void launchMainActivity() {
+        Intent intent = new Intent(NameActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finishAffinity();
     }
 }

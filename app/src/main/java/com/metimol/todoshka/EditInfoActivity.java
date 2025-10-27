@@ -35,7 +35,7 @@ public class EditInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_info_activity);
 
-        sharedPreferences = getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(GetStartedActivity.PREFS_NAME, Context.MODE_PRIVATE);
 
         ImageView ivBack = findViewById(R.id.ivBack);
         EditText etName = findViewById(R.id.etName);

@@ -19,7 +19,7 @@ public class MainViewModel extends AndroidViewModel {
     private final LiveData<List<CategoryInfo>> categoriesWithCountsLiveData;
 
     private final MutableLiveData<String> searchQuery = new MutableLiveData<>();
-    private final MutableLiveData<Integer> currentCategoryId = new MutableLiveData<>(ALL_CATEGORIES_ID);
+    final MutableLiveData<Integer> currentCategoryId = new MutableLiveData<>(ALL_CATEGORIES_ID);
 
     private LiveData<List<ToDo>> currentSource;
 

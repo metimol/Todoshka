@@ -34,9 +34,9 @@ import com.metimol.todoshka.database.ToDoDao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTaskCheckedListener, TaskAdapter.OnTaskClickListener {
-    public static final String PREFS_NAME = "TodoshkaPrefs";
     public static final String USER_NAME_KEY = "UserName";
 
     private ToDoDao toDoDao;
@@ -60,17 +60,10 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-
-        if (isNameNotSaved()) {
-            Intent intent = new Intent(this, NameActivity.class);
-            startActivity(intent);
-
-            finish();
-            return;
-        }
-
         setContentView(R.layout.main_activity);
+
+        sharedPreferences = getSharedPreferences(GetStartedActivity.PREFS_NAME, Context.MODE_PRIVATE);
+
 
         AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
         toDoDao = db.toDoDao();
@@ -91,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         chipAllTask = findViewById(R.id.chipAllTask);
 
         chipAllTask.setChecked(true);
-
+        setUserName();
 
         var main_layout = findViewById(R.id.main_activity_screen);
 
@@ -177,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
                 } else {
                     ivClearIcon.setVisibility(View.VISIBLE);
                     chipScrollView.setVisibility(View.GONE);
+                    // Снимаем выбор со всех чипов при поиске
+                    updateChipSelection(null);
                 }
             }
 
@@ -186,60 +181,73 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     }
 
     private boolean isAnyChipChecked() {
+        if (chipAllTask != null && chipAllTask.isChecked()) {
+            return true;
+        }
         for (Chip chip : categoryChips) {
             if (chip.isChecked()) {
                 return true;
             }
         }
-        return chipAllTask.isChecked();
+        return false;
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        if (isNameNotSaved()) {
-            Intent intent = new Intent(this, NameActivity.class);
-            startActivity(intent);
-            finish();
-            return;
-        }
-
-        String userName = sharedPreferences.getString(USER_NAME_KEY, "User");
-        tvTitle.setText(userName);
+        setUserName();
     }
+
+    private void setUserName() {
+        if (tvTitle != null && sharedPreferences != null) {
+            String userName = sharedPreferences.getString(USER_NAME_KEY, "User");
+            tvTitle.setText(userName);
+        }
+    }
+
 
     private void setupCategoryObserver() {
         toDoDao.getAllCategoriesLiveData().observe(this, categories -> {
+            Integer previouslySelectedCategoryId = getSelectedCategoryId();
+
             for (Chip chip : categoryChips) {
                 chipContainer.removeView(chip);
             }
             categoryChips.clear();
 
+            boolean restoredSelection = false;
             for (Category category : categories) {
-                addCategoryChip(category);
+                Chip newChip = addCategoryChip(category);
+                if (previouslySelectedCategoryId != null && previouslySelectedCategoryId.equals(category.id)) {
+                    newChip.setChecked(true);
+                    restoredSelection = true;
+                }
             }
 
             if (etSearch.getText().toString().trim().isEmpty()) {
-                restoreChipSelectionState();
+                if (!restoredSelection) {
+                    chipAllTask.setChecked(true);
+                    if (!Objects.equals(viewModel.currentCategoryId.getValue(), MainViewModel.ALL_CATEGORIES_ID)) {
+                        viewModel.loadTasks(MainViewModel.ALL_CATEGORIES_ID);
+                    }
+                } else {
+                    chipAllTask.setChecked(false);
+                }
             } else {
-                updateChipSelection(null);
+                chipAllTask.setChecked(false);
             }
         });
     }
 
-    private void restoreChipSelectionState() {
-        boolean isAnyCategoryChecked = false;
+    private Integer getSelectedCategoryId() {
         for (Chip chip : categoryChips) {
             if (chip.isChecked()) {
-                isAnyCategoryChecked = true;
-                break;
+                return (Integer) chip.getTag();
             }
         }
-        chipAllTask.setChecked(!isAnyCategoryChecked);
+        return null;
     }
-
 
     @SuppressLint("SetTextI18n")
     private void setupTaskObserver() {
@@ -251,8 +259,8 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
                 TextView tvEmptyTitle = findViewById(R.id.tvEmptyTitle);
                 TextView tvEmptySubtitle = findViewById(R.id.tvEmptySubtitle);
                 if (isSearching) {
-                    tvEmptyTitle.setText("Nothing found");
-                    tvEmptySubtitle.setText("Try a different search term");
+                    tvEmptyTitle.setText(R.string.nothing_found);
+                    tvEmptySubtitle.setText(R.string.try_different_search);
                 } else {
                     tvEmptyTitle.setText(R.string.empty_taskbox);
                     tvEmptySubtitle.setText(R.string.empty_taskbox_hint);
@@ -262,6 +270,9 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
                 rvTasks.setVisibility(View.VISIBLE);
                 emptyStateLayout.setVisibility(View.GONE);
                 taskAdapter.submitList(tasks);
+                if (!isSearching && !rvTasks.canScrollVertically(-1)) {
+                    rvTasks.scrollToPosition(0);
+                }
             }
         });
     }
@@ -275,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-                if (positionStart == 0 && etSearch.getText().toString().trim().isEmpty()) {
+                if (positionStart == 0 && etSearch.getText().toString().trim().isEmpty() && !rvTasks.canScrollVertically(-1)) {
                     rvTasks.scrollToPosition(0);
                 }
             }
@@ -291,11 +302,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         });
     }
 
-    private boolean isNameNotSaved() {
-        return !sharedPreferences.contains(USER_NAME_KEY);
-    }
-
-    private void addCategoryChip(Category category) {
+    private Chip addCategoryChip(Category category) {
         Context context = this;
         LayoutInflater inflater = LayoutInflater.from(context);
 
@@ -318,14 +325,13 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         });
 
         chipContainer.addView(newChip);
-
-
         categoryChips.add(newChip);
+        return newChip;
     }
 
 
     private void updateChipSelection(Chip selectedChip) {
-        if (chipAllTask != selectedChip && chipAllTask != null) {
+        if (chipAllTask != null && chipAllTask != selectedChip) {
             chipAllTask.setChecked(false);
         }
         for (Chip chip : categoryChips) {
@@ -347,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         viewModel.updateTodo(task);
         if (isChecked) {
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            if (vibrator != null) {
+            if (vibrator != null && vibrator.hasVibrator()) {
                 vibrator.vibrate(50);
             }
         }
