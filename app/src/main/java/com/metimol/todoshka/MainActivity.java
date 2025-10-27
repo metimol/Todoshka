@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     private LinearLayout emptyStateLayout;
     private Chip chipAllTask;
     private EditText etSearch;
+    private ImageView ivClearIcon;
     private HorizontalScrollView chipScrollView;
 
     private final List<Chip> categoryChips = new ArrayList<>();
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         FloatingActionButton fab = findViewById(R.id.fab);
         ImageView chipAdd = findViewById(R.id.chipAdd);
         etSearch = findViewById(R.id.etSearch);
+        ivClearIcon = findViewById(R.id.ivClearIcon);
         chipScrollView = findViewById(R.id.chipScrollView);
 
         rvTasks = findViewById(R.id.rvTasks);
@@ -148,6 +150,10 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
             viewModel.loadTasks(MainViewModel.ALL_CATEGORIES_ID);
             updateChipSelection(chipAllTask);
         });
+
+        ivClearIcon.setOnClickListener(v -> {
+            etSearch.setText("");
+        });
     }
 
     private void setupSearch() {
@@ -161,12 +167,14 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
                 viewModel.setSearchQuery(searchText.isEmpty() ? MainViewModel.NO_SEARCH : searchText);
 
                 if (searchText.isEmpty()) {
+                    ivClearIcon.setVisibility(View.GONE);
                     chipScrollView.setVisibility(View.VISIBLE);
                     if (!isAnyChipChecked()) {
                         chipAllTask.setChecked(true);
                         viewModel.loadTasks(MainViewModel.ALL_CATEGORIES_ID);
                     }
                 } else {
+                    ivClearIcon.setVisibility(View.VISIBLE);
                     chipScrollView.setVisibility(View.GONE);
                 }
             }
