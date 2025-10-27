@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -199,7 +200,11 @@ public class EditCategoriesActivity extends AppCompatActivity implements
     @Override
     public void onDeleteConfirmed(Category category) {
         Log.d(TAG, "onDeleteConfirmed for category: " + category.name);
-        viewModel.deleteCategory(category);
+        if (categoryAdapter.getItemCount() > 1) {
+            viewModel.deleteCategory(category);
+        } else {
+            Toast.makeText(this, "You must have at least one category.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
