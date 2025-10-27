@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -344,6 +345,12 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     public void onTaskChecked(ToDo task, boolean isChecked) {
         task.isCompleted = isChecked;
         viewModel.updateTodo(task);
+        if (isChecked) {
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null) {
+                vibrator.vibrate(50);
+            }
+        }
     }
 
     @Override
