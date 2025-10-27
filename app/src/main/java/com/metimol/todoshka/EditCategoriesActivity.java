@@ -60,7 +60,6 @@ public class EditCategoriesActivity extends AppCompatActivity implements
         ivBack.setOnClickListener(v -> finish());
         llAddCategory.setOnClickListener(v -> createCategory());
         ivDone.setOnClickListener(v -> {
-            Log.d(TAG, "Done button clicked.");
             saveCategoryOrder();
             finish();
         });
@@ -94,7 +93,6 @@ public class EditCategoriesActivity extends AppCompatActivity implements
                 if (fromPosition == RecyclerView.NO_POSITION || toPosition == RecyclerView.NO_POSITION) {
                     return false;
                 }
-                Log.d(TAG, "ItemTouchHelper onMove from " + fromPosition + " to " + toPosition);
                 categoryAdapter.onItemMove(fromPosition, toPosition);
                 return true;
             }
@@ -105,7 +103,6 @@ public class EditCategoriesActivity extends AppCompatActivity implements
             @Override
             public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
                 super.clearView(recyclerView, viewHolder);
-                Log.d(TAG, "ItemTouchHelper clearView (drag finished). Current adapter list might reflect the drag.");
             }
 
             @Override
@@ -125,7 +122,6 @@ public class EditCategoriesActivity extends AppCompatActivity implements
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        Log.d(TAG, "onStartDrag called for position: " + viewHolder.getAdapterPosition());
         if (itemTouchHelper != null) {
             itemTouchHelper.startDrag(viewHolder);
         }
@@ -137,12 +133,10 @@ public class EditCategoriesActivity extends AppCompatActivity implements
                 String orderLog = categoryInfos.stream()
                         .map(info -> info.category.name + "(pos:" + info.category.position + ")")
                         .collect(Collectors.joining(", "));
-                Log.d(TAG, "observeCategories: Received list from DB (" + categoryInfos.size() + "): " + orderLog);
 
                 categoryAdapter.submitList(categoryInfos);
                 rvCategories.setVisibility(categoryInfos.isEmpty() ? View.GONE : View.VISIBLE);
             } else {
-                Log.d(TAG, "observeCategories: Received null list from DB.");
                 categoryAdapter.submitList(new ArrayList<>());
                 rvCategories.setVisibility(View.GONE);
             }
@@ -155,11 +149,10 @@ public class EditCategoriesActivity extends AppCompatActivity implements
             String orderLog = updatedCategories.stream()
                     .map(cat -> cat.name + "(id:" + cat.id + ")")
                     .collect(Collectors.joining(", "));
-            Log.d(TAG, "saveCategoryOrder: Saving list (" + updatedCategories.size() + "): " + orderLog);
 
             viewModel.updateCategoriesOrder(updatedCategories);
         } else {
-            Log.d(TAG, "saveCategoryOrder: Adapter list is empty, nothing to save.");
+            Log.w(TAG, "saveCategoryOrder: Adapter list is empty, nothing to save.");
         }
     }
 
@@ -199,7 +192,6 @@ public class EditCategoriesActivity extends AppCompatActivity implements
 
     @Override
     public void onDeleteConfirmed(Category category) {
-        Log.d(TAG, "onDeleteConfirmed for category: " + category.name);
         if (categoryAdapter.getItemCount() > 1) {
             viewModel.deleteCategory(category);
         } else {
@@ -213,7 +205,6 @@ public class EditCategoriesActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause called, attempting to save category order.");
         saveCategoryOrder();
     }
 }

@@ -40,7 +40,6 @@ public class CategoryAdapter extends ListAdapter<CategoryInfo, CategoryAdapter.C
     public void submitList(@Nullable List<CategoryInfo> list) {
         internalList = list == null ? new ArrayList<>() : new ArrayList<>(list);
         super.submitList(internalList);
-        Log.d("CategoryAdapter", "submitList called, internalList size: " + internalList.size());
     }
 
     private OnCategorySettingsClickListener settingsClickListener;
@@ -149,21 +148,17 @@ public class CategoryAdapter extends ListAdapter<CategoryInfo, CategoryAdapter.C
             }
         }
         notifyItemMoved(fromPosition, toPosition);
-        Log.d("CategoryAdapter", "onItemMove completed, moved from " + fromPosition + " to " + toPosition);
     }
 
     public List<Category> getCurrentCategoryList() {
         List<Category> categories = new ArrayList<>();
-        Log.d("CategoryAdapter", "getCurrentCategoryList called, internalList size: " + internalList.size());
         for (CategoryInfo info : internalList) {
             if (info != null && info.category != null) {
                 categories.add(info.category);
-                Log.d("CategoryAdapter", "  Adding to save list: " + info.category.name + " (current pos in DB: " + info.category.position + ")");
             } else {
                 Log.w("CategoryAdapter", "  Skipping null CategoryInfo or Category in internalList during save preparation.");
             }
         }
-        Log.d("CategoryAdapter", "Returning category list for saving, size: " + categories.size());
         return categories;
     }
 
