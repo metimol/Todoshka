@@ -195,7 +195,7 @@ public class EditCategoriesActivity extends AppCompatActivity implements
         if (categoryAdapter.getItemCount() > 1) {
             viewModel.deleteCategory(category);
         } else {
-            Toast.makeText(this, "You must have at least one category.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.at_least_one_category), Toast.LENGTH_SHORT).show();
         }
     }
 

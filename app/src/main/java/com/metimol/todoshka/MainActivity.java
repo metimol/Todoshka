@@ -170,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
                 } else {
                     ivClearIcon.setVisibility(View.VISIBLE);
                     chipScrollView.setVisibility(View.GONE);
-                    // Снимаем выбор со всех чипов при поиске
                     updateChipSelection(null);
                 }
             }

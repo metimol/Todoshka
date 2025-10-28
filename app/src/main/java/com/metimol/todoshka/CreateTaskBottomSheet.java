@@ -120,7 +120,7 @@ public class CreateTaskBottomSheet extends BottomSheetDialogFragment {
             String taskText = etNewTask.getText().toString().trim();
 
             if (taskText.isEmpty()) {
-                etNewTask.setError("Task cannot be empty");
+                etNewTask.setError(getString(R.string.empty_task));
             } else {
                 AppDatabase.databaseWriteExecutor.execute(() -> {
                     ToDo toDo = new ToDo();
@@ -139,7 +139,6 @@ public class CreateTaskBottomSheet extends BottomSheetDialogFragment {
         selectedPriority.setOnClickListener(v -> selectPriority());
     }
 
-    @SuppressLint("SetTextI18n")
     private void loadCategories() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             categories = toDoDao.getAllCategoriesInternal();
@@ -154,10 +153,10 @@ public class CreateTaskBottomSheet extends BottomSheetDialogFragment {
                     if (selectedCategory != null) {
                         tvSelectedCategory.setText(selectedCategory.name);
                     } else {
-                        tvSelectedCategory.setText("No Category");
+                        tvSelectedCategory.setText(getString(R.string.no_category));
                     }
                 } else {
-                    tvSelectedCategory.setText("No Category");
+                    tvSelectedCategory.setText(getString(R.string.no_category));
                 }
             });
         });

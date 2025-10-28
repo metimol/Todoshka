@@ -42,7 +42,7 @@ public class NameActivity extends AppCompatActivity {
                 saveNameAndMarkFirstLaunchComplete(name);
                 launchMainActivity();
             } else {
-                Toast.makeText(NameActivity.this, "The name must contain at least 5 letters", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NameActivity.this, getString(R.string.short_name), Toast.LENGTH_SHORT).show();
             }
         });
 

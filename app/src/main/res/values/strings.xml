@@ -51,4 +51,16 @@
     <string name="are_you_sure_category">Are You Sure?</string>
     <string name="delete_category_confirmation">Do you really want to delete this category and all related tasks? This process can\'t be undone.</string>
     <string name="losung">Just Your Tasks.\nNo Clutter.</string>
+    <string name="short_name">The name must contain at least 5 letters</string>
+    <string name="empty_category">Category cannot be empty</string>
+    <string name="empty_task">Task cannot be empty</string>
+    <string name="no_category">No Category</string>
+    <string name="at_least_one_category">You must have at least one category.</string>
+    <string name="cannot_open_link">No application found to open the link</string>
+    <string name="share_via">Share Todoshka via…</string>
+    <string name="share_message">Hey! Check out this awesome to-do app I\'m using: Todoshka. It really helps me stay organized! Get it here: </string>
+    <string name="cannot_load_task">Cannot load info about task</string>
+    <string name="cannot_remove_task">Cannot remove task</string>
+    <string name="version">Version: </string>
+    <string name="task"> task</string>
 </resources>

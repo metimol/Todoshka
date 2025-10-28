@@ -62,7 +62,7 @@ public class EditInfoActivity extends AppCompatActivity {
                 saveName(newName);
                 finish();
             } else {
-                Toast.makeText(EditInfoActivity.this, "The name must contain at least 5 letters", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditInfoActivity.this, getString(R.string.short_name), Toast.LENGTH_SHORT).show();
             }
         });
 

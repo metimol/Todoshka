@@ -90,11 +90,11 @@ public class ConfirmDeleteDialog extends DialogFragment {
         TextView tvHint = view.findViewById(R.id.tvHint);
 
         if (categoryToDelete != null) {
-            tvTitle.setText(R.string.are_you_sure_category);
-            tvHint.setText(R.string.delete_category_confirmation);
+            tvTitle.setText(getString(R.string.are_you_sure_category));
+            tvHint.setText(getString(R.string.delete_category_confirmation));
         } else {
-            tvTitle.setText(R.string.are_you_sure);
-            tvHint.setText(R.string.do_you_really_want_to_delete_this_task_this_process_can_t_be_undone);
+            tvTitle.setText(getString(R.string.are_you_sure));
+            tvHint.setText(getString(R.string.do_you_really_want_to_delete_this_task_this_process_can_t_be_undone));
         }
 
         btnCancel.setOnClickListener(v -> dismiss());

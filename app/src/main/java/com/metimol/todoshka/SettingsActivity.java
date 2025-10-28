@@ -58,7 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        tvVersion.setText("Version: " + BuildConfig.VERSION_NAME);
+        tvVersion.setText(getString(R.string.version) + BuildConfig.VERSION_NAME);
 
         rateUsButton.setOnClickListener(v -> {
             String url = "https://github.com/metimol/Todoshka";
@@ -69,7 +69,7 @@ public class SettingsActivity extends AppCompatActivity {
             try {
                 v.getContext().startActivity(intent);
             } catch (android.content.ActivityNotFoundException e) {
-                Toast.makeText(v.getContext(), "No application found to open the link", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), getString(R.string.cannot_open_link), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -78,13 +78,13 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String appUrl = "https://github.com/metimol/Todoshka";
                 Intent sendIntent = getIntent(appUrl);
-                Intent shareIntent = Intent.createChooser(sendIntent, "Share Todoshka via...");
+                Intent shareIntent = Intent.createChooser(sendIntent, getString(R.string.share_via));
                 v.getContext().startActivity(shareIntent);
             }
 
             @NonNull
             private Intent getIntent(String appUrl) {
-                String recommendationText = "Hey! Check out this awesome to-do app I'm using: Todoshka. It really helps me stay organized! Get it here: " + appUrl;
+                String recommendationText = getString(R.string.share_message) + appUrl;
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, recommendationText);

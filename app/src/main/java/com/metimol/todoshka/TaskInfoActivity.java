@@ -62,12 +62,12 @@ public class TaskInfoActivity extends AppCompatActivity implements ConfirmDelete
                 fetchAndDisplayCategoryName(currentTask.categoryId);
             } else {
                 Log.e(TAG, "Error: Retrieve task null object from Intent.");
-                Toast.makeText(this, "Cannot load info about task", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.cannot_load_task), Toast.LENGTH_SHORT).show();
                 finish();
             }
         } else {
             Log.e(TAG, "Error: Intent doesn't content task data.");
-            Toast.makeText(this, "Cannot load info about task", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.cannot_load_task), Toast.LENGTH_SHORT).show();
             finish();
         }
 
@@ -78,7 +78,7 @@ public class TaskInfoActivity extends AppCompatActivity implements ConfirmDelete
                 ConfirmDeleteDialog dialog = ConfirmDeleteDialog.newInstance(currentTask);
                 dialog.show(getSupportFragmentManager(), ConfirmDeleteDialog.TAG);
             } else {
-                Toast.makeText(TaskInfoActivity.this, "Cannot remove task", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TaskInfoActivity.this, getString(R.string.cannot_remove_task), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -148,7 +148,5 @@ public class TaskInfoActivity extends AppCompatActivity implements ConfirmDelete
     }
 
     @Override
-    public void onDeleteConfirmed(Category category) {
-        // Not used in this activity
-    }
+    public void onDeleteConfirmed(Category category) { }
 }
