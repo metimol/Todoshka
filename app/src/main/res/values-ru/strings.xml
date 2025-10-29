@@ -59,9 +59,9 @@
     <string name="at_least_one_category">У вас должна быть хотя бы одна категория.</string>
     <string name="cannot_open_link">Не найдено приложение, чтобы открыть ссылку</string>
     <string name="share_via">Поделиться Todoshka через…</string>
-    <string name="share_message">Привет! Зацени это классное приложение для задач: Todoshka. Оно реально помогает мне быть организованным! Скачать тут: </string>
+    <string name="share_message">Привет! Зацени это классное приложение для задач: Todoshka. Оно реально помогает мне быть организованным! Скачать тут:</string>
     <string name="cannot_load_task">Не удалось загрузить информацию о задаче</string>
     <string name="cannot_remove_task">Не удалось удалить задачу</string>
-    <string name="version">Версия: </string>
-    <string name="task"> задач</string>
+    <string name="version">Версия:</string>
+    <string name="task">задач</string>
 </resources>

@@ -120,7 +120,7 @@ public class CategoryAdapter extends ListAdapter<CategoryInfo, CategoryAdapter.C
             final Category category = categoryInfo.category;
 
             tvCategoryTitle.setText(category.name);
-            tvCompletedTodos.setText(categoryInfo.completedTasks + "/" + categoryInfo.totalTasks + R.string.task);
+            tvCompletedTodos.setText(categoryInfo.completedTasks + "/" + categoryInfo.totalTasks + " " + itemView.getContext().getString(R.string.task));
             tvCompletedTodos.setVisibility(View.VISIBLE);
 
             ivOpenCategorySettings.setOnClickListener(v -> {

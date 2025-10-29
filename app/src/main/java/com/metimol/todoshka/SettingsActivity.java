@@ -58,7 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        tvVersion.setText(getString(R.string.version) + BuildConfig.VERSION_NAME);
+        tvVersion.setText(getString(R.string.version) + " " + BuildConfig.VERSION_NAME);
 
         rateUsButton.setOnClickListener(v -> {
             String url = "https://github.com/metimol/Todoshka";
@@ -84,7 +84,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             @NonNull
             private Intent getIntent(String appUrl) {
-                String recommendationText = getString(R.string.share_message) + appUrl;
+                String recommendationText = getString(R.string.share_message) + " " + appUrl;
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, recommendationText);
