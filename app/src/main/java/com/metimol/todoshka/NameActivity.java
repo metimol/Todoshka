@@ -49,7 +49,9 @@ public class NameActivity extends AppCompatActivity {
         var nameLayout = findViewById(R.id.name_activity_screen);
         ViewCompat.setOnApplyWindowInsetsListener(nameLayout, (view, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            int bottomPadding = Math.max(systemBars.bottom, ime.bottom);
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
             return WindowInsetsCompat.CONSUMED;
         });
     }
