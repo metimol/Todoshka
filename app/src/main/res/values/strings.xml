@@ -63,4 +63,8 @@
     <string name="cannot_remove_task">Cannot remove task</string>
     <string name="version">Version:</string>
     <string name="task">task</string>
+    <string name="clean_icon">Clean Icon</string>
+    <string name="remove_completed_tasks">Remove Completed Tasks</string>
+    <string name="delete_completed_tasks_confirmation">Do you really want to delete all completed tasks? This process can\'t be undone.</string>
+    <string name="completed_tasks_removed">Completed tasks removed</string>
 </resources>

@@ -20,12 +20,17 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
-public class SettingsActivity extends AppCompatActivity {
+import com.metimol.todoshka.database.Category;
+import com.metimol.todoshka.database.ToDo;
+
+public class SettingsActivity extends AppCompatActivity implements ConfirmDeleteDialog.ConfirmDeleteListener {
 
     private SharedPreferences sharedPreferences;
     private TextView tvUserName;
     private ImageView ivAvatar;
+    private MainViewModel viewModel;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -33,10 +38,13 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
 
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
         ImageView ivBack = findViewById(R.id.ivBack);
         tvUserName = findViewById(R.id.tvUserName);
         ConstraintLayout clEditInfo = findViewById(R.id.clEditInfo);
         ConstraintLayout clEditCategories = findViewById(R.id.clEditCategories);
+        ConstraintLayout clRemoveCompletedTasks = findViewById(R.id.clRemoveCompletedTasks);
         LinearLayout rateUsButton = findViewById(R.id.rateUsButton);
         LinearLayout shareButton = findViewById(R.id.shareButton);
         ivAvatar = findViewById(R.id.ivAvatar);
@@ -56,6 +64,11 @@ public class SettingsActivity extends AppCompatActivity {
         clEditCategories.setOnClickListener(v -> {
             Intent intent = new Intent(this, EditCategoriesActivity.class);
             startActivity(intent);
+        });
+
+        clRemoveCompletedTasks.setOnClickListener(v -> {
+            ConfirmDeleteDialog dialog = ConfirmDeleteDialog.newInstance(ConfirmDeleteDialog.ACTION_DELETE_COMPLETED);
+            dialog.show(getSupportFragmentManager(), ConfirmDeleteDialog.TAG);
         });
 
         tvVersion.setText(getString(R.string.version) + " " + BuildConfig.VERSION_NAME);
@@ -125,5 +138,17 @@ public class SettingsActivity extends AppCompatActivity {
                 ivAvatar.setImageResource(R.drawable.ic_women_avatar);
                 break;
         }
+    }
+
+    @Override
+    public void onDeleteConfirmed(Category category) {}
+
+    @Override
+    public void onDeleteConfirmed(ToDo task) {}
+
+    @Override
+    public void onDeleteCompletedTasksConfirmed() {
+        viewModel.deleteCompletedTodos();
+        Toast.makeText(this, getString(R.string.completed_tasks_removed), Toast.LENGTH_SHORT).show();
     }
 }

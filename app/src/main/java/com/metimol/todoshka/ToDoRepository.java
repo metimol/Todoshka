@@ -113,6 +113,10 @@ public class ToDoRepository {
         });
     }
 
+    public void deleteCompletedTodos() {
+        databaseWriteExecutor.execute(toDoDao::deleteCompletedTodos);
+    }
+
     public LiveData<List<Category>> getAllCategoriesLiveData() {
         return allCategories;
     }

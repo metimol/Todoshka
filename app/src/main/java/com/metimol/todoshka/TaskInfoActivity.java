@@ -149,4 +149,7 @@ public class TaskInfoActivity extends AppCompatActivity implements ConfirmDelete
 
     @Override
     public void onDeleteConfirmed(Category category) { }
+
+    @Override
+    public void onDeleteCompletedTasksConfirmed() { }
 }

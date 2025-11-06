@@ -64,4 +64,8 @@
     <string name="cannot_remove_task">Не вдалося видалити завдання</string>
     <string name="version">Версія:</string>
     <string name="task">завдань</string>
+    <string name="clean_icon">Очистити</string>
+    <string name="remove_completed_tasks">Видалити виконані завдання</string>
+    <string name="delete_completed_tasks_confirmation">Ви справді хочете видалити всі виконані завдання? Цей процес неможливо скасувати.</string>
+    <string name="completed_tasks_removed">Виконані завдання видалено</string>
 </resources>

@@ -79,4 +79,7 @@ public interface ToDoDao {
 
     @Delete
     void deleteCategory(Category category);
+
+    @Query("DELETE FROM todos WHERE isCompleted = 1")
+    void deleteCompletedTodos();
 }

@@ -203,6 +203,9 @@ public class EditCategoriesActivity extends AppCompatActivity implements
     public void onDeleteConfirmed(ToDo task) { }
 
     @Override
+    public void onDeleteCompletedTasksConfirmed() { }
+
+    @Override
     protected void onPause() {
         super.onPause();
         saveCategoryOrder();

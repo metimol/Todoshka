@@ -64,4 +64,8 @@
     <string name="cannot_remove_task">Не удалось удалить задачу</string>
     <string name="version">Версия:</string>
     <string name="task">задач</string>
+    <string name="clean_icon">Иконка очистки</string>
+    <string name="remove_completed_tasks">Удалить выполненные задачи</string>
+    <string name="delete_completed_tasks_confirmation">Вы действительно хотите удалить все выполненные задачи? Этот процесс нельзя будет отменить.</string>
+    <string name="completed_tasks_removed">Выполненные задачи удалены</string>
 </resources>
