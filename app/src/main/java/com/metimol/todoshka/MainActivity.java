@@ -100,8 +100,6 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         });
 
         setupRecyclerView();
-        setupCategoryObserver();
-        setupTaskObserver();
         setupSearch();
 
         getSupportFragmentManager().setFragmentResultListener(
@@ -148,6 +146,22 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         ivClearIcon.setOnClickListener(v -> {
             etSearch.setText("");
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        viewModel.getTasks().observeForever(taskObserver);
+        toDoDao.getAllCategoriesLiveData().observeForever(categoryObserver);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        viewModel.getTasks().removeObserver(taskObserver);
+        toDoDao.getAllCategoriesLiveData().removeObserver(categoryObserver);
     }
 
     private void setupSearch() {
@@ -206,38 +220,59 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     }
 
 
-    private void setupCategoryObserver() {
-        toDoDao.getAllCategoriesLiveData().observe(this, categories -> {
-            Integer previouslySelectedCategoryId = getSelectedCategoryId();
-
-            for (Chip chip : categoryChips) {
-                chipContainer.removeView(chip);
+    private final androidx.lifecycle.Observer<List<ToDo>> taskObserver = tasks -> {
+        boolean isSearching = !etSearch.getText().toString().trim().isEmpty();
+        if (tasks == null || tasks.isEmpty()) {
+            rvTasks.setVisibility(View.GONE);
+            emptyStateLayout.setVisibility(View.VISIBLE);
+            TextView tvEmptyTitle = findViewById(R.id.tvEmptyTitle);
+            TextView tvEmptySubtitle = findViewById(R.id.tvEmptySubtitle);
+            if (isSearching) {
+                tvEmptyTitle.setText(R.string.nothing_found);
+                tvEmptySubtitle.setText(R.string.try_different_search);
+            } else {
+                tvEmptyTitle.setText(R.string.empty_taskbox);
+                tvEmptySubtitle.setText(R.string.empty_taskbox_hint);
             }
-            categoryChips.clear();
-
-            boolean restoredSelection = false;
-            for (Category category : categories) {
-                Chip newChip = addCategoryChip(category);
-                if (previouslySelectedCategoryId != null && previouslySelectedCategoryId.equals(category.id)) {
-                    newChip.setChecked(true);
-                    restoredSelection = true;
-                }
+        } else {
+            rvTasks.setVisibility(View.VISIBLE);
+            emptyStateLayout.setVisibility(View.GONE);
+            taskAdapter.submitList(tasks);
+            if (!isSearching && !rvTasks.canScrollVertically(-1)) {
+                rvTasks.scrollToPosition(0);
             }
+        }
+    };
 
-            if (etSearch.getText().toString().trim().isEmpty()) {
-                if (!restoredSelection) {
-                    chipAllTask.setChecked(true);
-                    if (!Objects.equals(viewModel.currentCategoryId.getValue(), MainViewModel.ALL_CATEGORIES_ID)) {
-                        viewModel.loadTasks(MainViewModel.ALL_CATEGORIES_ID);
-                    }
-                } else {
-                    chipAllTask.setChecked(false);
+    private final androidx.lifecycle.Observer<List<Category>> categoryObserver = categories -> {
+        Integer previouslySelectedCategoryId = getSelectedCategoryId();
+        for (Chip chip : categoryChips) {
+            chipContainer.removeView(chip);
+        }
+        categoryChips.clear();
+
+        boolean restoredSelection = false;
+        for (Category category : categories) {
+            Chip newChip = addCategoryChip(category);
+            if (previouslySelectedCategoryId != null && previouslySelectedCategoryId.equals(category.id)) {
+                newChip.setChecked(true);
+                restoredSelection = true;
+            }
+        }
+
+        if (etSearch.getText().toString().trim().isEmpty()) {
+            if (!restoredSelection) {
+                chipAllTask.setChecked(true);
+                if (!Objects.equals(viewModel.currentCategoryId.getValue(), MainViewModel.ALL_CATEGORIES_ID)) {
+                    viewModel.loadTasks(MainViewModel.ALL_CATEGORIES_ID);
                 }
             } else {
                 chipAllTask.setChecked(false);
             }
-        });
-    }
+        } else {
+            chipAllTask.setChecked(false);
+        }
+    };
 
     private Integer getSelectedCategoryId() {
         for (Chip chip : categoryChips) {
@@ -246,34 +281,6 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
             }
         }
         return null;
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void setupTaskObserver() {
-        viewModel.getTasks().observe(this, tasks -> {
-            boolean isSearching = !etSearch.getText().toString().trim().isEmpty();
-            if (tasks == null || tasks.isEmpty()) {
-                rvTasks.setVisibility(View.GONE);
-                emptyStateLayout.setVisibility(View.VISIBLE);
-                TextView tvEmptyTitle = findViewById(R.id.tvEmptyTitle);
-                TextView tvEmptySubtitle = findViewById(R.id.tvEmptySubtitle);
-                if (isSearching) {
-                    tvEmptyTitle.setText(R.string.nothing_found);
-                    tvEmptySubtitle.setText(R.string.try_different_search);
-                } else {
-                    tvEmptyTitle.setText(R.string.empty_taskbox);
-                    tvEmptySubtitle.setText(R.string.empty_taskbox_hint);
-                }
-
-            } else {
-                rvTasks.setVisibility(View.VISIBLE);
-                emptyStateLayout.setVisibility(View.GONE);
-                taskAdapter.submitList(tasks);
-                if (!isSearching && !rvTasks.canScrollVertically(-1)) {
-                    rvTasks.scrollToPosition(0);
-                }
-            }
-        });
     }
 
     private void setupRecyclerView() {
