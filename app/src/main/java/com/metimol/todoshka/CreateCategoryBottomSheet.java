@@ -84,7 +84,7 @@ public class CreateCategoryBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void addCategory() {
-        String categoryName = etNewCategory.getText().toString();
+        String categoryName = etNewCategory.getText().toString().trim();
         if (categoryName.isEmpty()) {
             etNewCategory.setError(getString(R.string.empty_category));
         } else {
