@@ -38,26 +38,6 @@
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait"> </activity>
 
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"> </activity>
-
-        <activity
-            android:name=".EditInfoActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"> </activity>
-
-        <activity
-            android:name=".TaskInfoActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"> </activity>
-
-        <activity
-            android:name=".EditCategoriesActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"> </activity>
-
     </application>
 
 </manifest>

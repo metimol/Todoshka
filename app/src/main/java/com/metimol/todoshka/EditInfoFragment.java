@@ -5,20 +5,26 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.imageview.ShapeableImageView;
 
-public class EditInfoActivity extends AppCompatActivity {
+public class EditInfoFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     public static final String USER_AVATAR_KEY = "user_avatar";
 
@@ -30,21 +36,26 @@ public class EditInfoActivity extends AppCompatActivity {
     private float strokeSelectedPx;
     private int paddingSelectedPx;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_info_activity);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_edit_info, container, false);
+    }
 
-        sharedPreferences = getSharedPreferences(GetStartedActivity.PREFS_NAME, Context.MODE_PRIVATE);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        ImageView ivBack = findViewById(R.id.ivBack);
-        EditText etName = findViewById(R.id.etName);
-        ImageView ivDone = findViewById(R.id.ivDone);
+        sharedPreferences = requireActivity().getSharedPreferences(GetStartedActivity.PREFS_NAME, Context.MODE_PRIVATE);
 
-        ivAvatarWomen = findViewById(R.id.ivAvatarWomen);
-        ivAvatarMen = findViewById(R.id.ivAvatarMen);
-        LinearLayout llAvatarWomen = findViewById(R.id.llAvatarWomen);
-        LinearLayout llAvatarMen = findViewById(R.id.llAvatarMen);
+        ImageView ivBack = view.findViewById(R.id.ivBack);
+        EditText etName = view.findViewById(R.id.etName);
+        ImageView ivDone = view.findViewById(R.id.ivDone);
+
+        ivAvatarWomen = view.findViewById(R.id.ivAvatarWomen);
+        ivAvatarMen = view.findViewById(R.id.ivAvatarMen);
+        LinearLayout llAvatarWomen = view.findViewById(R.id.llAvatarWomen);
+        LinearLayout llAvatarMen = view.findViewById(R.id.llAvatarMen);
 
         initSelectionResources();
 
@@ -53,16 +64,16 @@ public class EditInfoActivity extends AppCompatActivity {
             etName.setText(currentName);
         }
 
-        ivBack.setOnClickListener(v -> finish());
+        ivBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
         ivDone.setOnClickListener(v -> {
             String newName = etName.getText().toString().trim();
 
             if (isValidName(newName)) {
                 saveName(newName);
-                finish();
+                Navigation.findNavController(v).popBackStack();
             } else {
-                Toast.makeText(EditInfoActivity.this, getString(R.string.short_name), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.short_name), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -77,11 +88,10 @@ public class EditInfoActivity extends AppCompatActivity {
         String avatarSelected = sharedPreferences.getString(USER_AVATAR_KEY, "men");
         updateAvatarSelection(avatarSelected);
 
-
-        var edit_info_layout = findViewById(R.id.edit_info_activity_screen);
-        ViewCompat.setOnApplyWindowInsetsListener(edit_info_layout, (view, insets) -> {
+        var edit_info_layout = view.findViewById(R.id.edit_info_fragment_screen);
+        ViewCompat.setOnApplyWindowInsetsListener(edit_info_layout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(
+            v.setPadding(
                     systemBars.left,
                     systemBars.top,
                     systemBars.right,
@@ -130,7 +140,7 @@ public class EditInfoActivity extends AppCompatActivity {
     }
 
     private void initSelectionResources() {
-        Context context = getApplicationContext();
+        Context context = requireContext();
 
         purpleColor = ContextCompat.getColorStateList(context, R.color.purple);
         transparentColor = ContextCompat.getColorStateList(context, android.R.color.transparent);

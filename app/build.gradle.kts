@@ -53,4 +53,6 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
 }

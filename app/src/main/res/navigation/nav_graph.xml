@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.metimol.todoshka.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_taskInfoFragment"
+            app:destination="@id/taskInfoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.metimol.todoshka.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_editInfoFragment"
+            app:destination="@id/editInfoFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_editCategoriesFragment"
+            app:destination="@id/editCategoriesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/taskInfoFragment"
+        android:name="com.metimol.todoshka.TaskInfoFragment"
+        android:label="fragment_task_info"
+        tools:layout="@layout/fragment_task_info" >
+        <argument
+            android:name="task"
+            app:argType="com.metimol.todoshka.database.ToDo" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editInfoFragment"
+        android:name="com.metimol.todoshka.EditInfoFragment"
+        android:label="fragment_edit_info"
+        tools:layout="@layout/fragment_edit_info" />
+
+    <fragment
+        android:id="@+id/editCategoriesFragment"
+        android:name="com.metimol.todoshka.EditCategoriesFragment"
+        android:label="fragment_edit_categories"
+        tools:layout="@layout/fragment_edit_categories" />
+
+</navigation>

@@ -14,11 +14,13 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,10 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EditCategoriesActivity extends AppCompatActivity implements
+public class EditCategoriesFragment extends Fragment implements
         ConfirmDeleteDialog.ConfirmDeleteListener, CategoryAdapter.OnStartDragListener {
 
-    private static final String TAG = "EditCategoriesActivity";
+    private static final String TAG = "EditCategoriesFragment";
 
     private MainViewModel viewModel;
     private CategoryAdapter categoryAdapter;
@@ -41,40 +43,45 @@ public class EditCategoriesActivity extends AppCompatActivity implements
     private PopupWindow popupWindow;
     private ItemTouchHelper itemTouchHelper;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_category_activity);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_edit_categories, container, false);
+    }
 
-        ImageView ivBack = findViewById(R.id.ivBack);
-        LinearLayout llAddCategory = findViewById(R.id.llAddCategory);
-        rvCategories = findViewById(R.id.rvCategories);
-        ImageView ivDone = findViewById(R.id.ivDone);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        ImageView ivBack = view.findViewById(R.id.ivBack);
+        LinearLayout llAddCategory = view.findViewById(R.id.llAddCategory);
+        rvCategories = view.findViewById(R.id.rvCategories);
+        ImageView ivDone = view.findViewById(R.id.ivDone);
+
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         setupRecyclerView();
         observeCategories();
         setupItemTouchHelper();
 
-        ivBack.setOnClickListener(v -> finish());
+        ivBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
         llAddCategory.setOnClickListener(v -> createCategory());
         ivDone.setOnClickListener(v -> {
             saveCategoryOrder();
-            finish();
+            Navigation.findNavController(v).popBackStack();
         });
 
-        var editCategoriesLayout = findViewById(R.id.edit_categories_activity_screen);
-        ViewCompat.setOnApplyWindowInsetsListener(editCategoriesLayout, (view, insets) -> {
+        var editCategoriesLayout = view.findViewById(R.id.edit_categories_fragment_screen);
+        ViewCompat.setOnApplyWindowInsetsListener(editCategoriesLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return WindowInsetsCompat.CONSUMED;
         });
     }
 
     private void setupRecyclerView() {
         categoryAdapter = new CategoryAdapter();
-        rvCategories.setLayoutManager(new LinearLayoutManager(this));
+        rvCategories.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvCategories.setAdapter(categoryAdapter);
         categoryAdapter.setOnCategorySettingsClickListener(this::showCategoryPopupMenu);
         categoryAdapter.setOnStartDragListener(this);
@@ -128,7 +135,7 @@ public class EditCategoriesActivity extends AppCompatActivity implements
     }
 
     private void observeCategories() {
-        viewModel.getCategoriesWithCounts().observe(this, categoryInfos -> {
+        viewModel.getCategoriesWithCounts().observe(getViewLifecycleOwner(), categoryInfos -> {
             if (categoryInfos != null) {
                 String orderLog = categoryInfos.stream()
                         .map(info -> info.category.name + "(pos:" + info.category.position + ")")
@@ -157,7 +164,7 @@ public class EditCategoriesActivity extends AppCompatActivity implements
     }
 
     private void showCategoryPopupMenu(Category category, View anchorView) {
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams")
         View popupView = inflater.inflate(R.layout.item_category_settings, null);
 
@@ -174,7 +181,7 @@ public class EditCategoriesActivity extends AppCompatActivity implements
 
         popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         int popupWidth = popupView.getMeasuredWidth();
-        int xOffset = -popupWidth - (int) Utils.dpToPx(this, 10);
+        int xOffset = -popupWidth - (int) Utils.dpToPx(requireContext(), 10);
         int yOffset = -anchorView.getHeight() / 2 - popupView.getMeasuredHeight() / 2;
 
         popupWindow.showAsDropDown(anchorView, xOffset, yOffset);
@@ -182,12 +189,12 @@ public class EditCategoriesActivity extends AppCompatActivity implements
 
     private void createCategory() {
         CreateCategoryBottomSheet bottomSheet = new CreateCategoryBottomSheet();
-        bottomSheet.show(getSupportFragmentManager(), CreateCategoryBottomSheet.TAG);
+        bottomSheet.show(getParentFragmentManager(), CreateCategoryBottomSheet.TAG);
     }
 
     private void showConfirmDeleteDialog(Category category) {
         ConfirmDeleteDialog dialog = ConfirmDeleteDialog.newInstance(category);
-        dialog.show(getSupportFragmentManager(), ConfirmDeleteDialog.TAG);
+        dialog.show(getChildFragmentManager(), ConfirmDeleteDialog.TAG);
     }
 
     @Override
@@ -195,7 +202,7 @@ public class EditCategoriesActivity extends AppCompatActivity implements
         if (categoryAdapter.getItemCount() > 1) {
             viewModel.deleteCategory(category);
         } else {
-            Toast.makeText(this, getString(R.string.at_least_one_category), Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.at_least_one_category), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -206,7 +213,7 @@ public class EditCategoriesActivity extends AppCompatActivity implements
     public void onDeleteCompletedTasksConfirmed() { }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         saveCategoryOrder();
     }

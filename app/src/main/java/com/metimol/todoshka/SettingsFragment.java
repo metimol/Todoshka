@@ -1,6 +1,6 @@
 package com.metimol.todoshka;
 
-import static com.metimol.todoshka.EditInfoActivity.USER_AVATAR_KEY;
+import static com.metimol.todoshka.MainActivity.USER_AVATAR_KEY;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,67 +8,74 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.metimol.todoshka.database.Category;
 import com.metimol.todoshka.database.ToDo;
 
-public class SettingsActivity extends AppCompatActivity implements ConfirmDeleteDialog.ConfirmDeleteListener {
+public class SettingsFragment extends Fragment implements ConfirmDeleteDialog.ConfirmDeleteListener {
 
     private SharedPreferences sharedPreferences;
     private TextView tvUserName;
     private ImageView ivAvatar;
     private MainViewModel viewModel;
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_settings, container, false);
+    }
+
     @SuppressLint("SetTextI18n")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_activity);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-        ImageView ivBack = findViewById(R.id.ivBack);
-        tvUserName = findViewById(R.id.tvUserName);
-        ConstraintLayout clEditInfo = findViewById(R.id.clEditInfo);
-        ConstraintLayout clEditCategories = findViewById(R.id.clEditCategories);
-        ConstraintLayout clRemoveCompletedTasks = findViewById(R.id.clRemoveCompletedTasks);
-        LinearLayout rateUsButton = findViewById(R.id.rateUsButton);
-        LinearLayout shareButton = findViewById(R.id.shareButton);
-        ivAvatar = findViewById(R.id.ivAvatar);
-        TextView tvVersion = findViewById(R.id.tvVersion);
+        ImageView ivBack = view.findViewById(R.id.ivBack);
+        tvUserName = view.findViewById(R.id.tvUserName);
+        ConstraintLayout clEditInfo = view.findViewById(R.id.clEditInfo);
+        ConstraintLayout clEditCategories = view.findViewById(R.id.clEditCategories);
+        ConstraintLayout clRemoveCompletedTasks = view.findViewById(R.id.clRemoveCompletedTasks);
+        LinearLayout rateUsButton = view.findViewById(R.id.rateUsButton);
+        LinearLayout shareButton = view.findViewById(R.id.shareButton);
+        ivAvatar = view.findViewById(R.id.ivAvatar);
+        TextView tvVersion = view.findViewById(R.id.tvVersion);
 
-        sharedPreferences = getSharedPreferences(GetStartedActivity.PREFS_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = requireActivity().getSharedPreferences(GetStartedActivity.PREFS_NAME, Context.MODE_PRIVATE);
 
         loadAndSetUserInfo();
 
-        ivBack.setOnClickListener(v -> finish());
+        ivBack.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
 
         clEditInfo.setOnClickListener(v -> {
-            Intent intent = new Intent(this, EditInfoActivity.class);
-            startActivity(intent);
+            Navigation.findNavController(v).navigate(R.id.action_settingsFragment_to_editInfoFragment);
         });
 
         clEditCategories.setOnClickListener(v -> {
-            Intent intent = new Intent(this, EditCategoriesActivity.class);
-            startActivity(intent);
+            Navigation.findNavController(v).navigate(R.id.action_settingsFragment_to_editCategoriesFragment);
         });
 
         clRemoveCompletedTasks.setOnClickListener(v -> {
             ConfirmDeleteDialog dialog = ConfirmDeleteDialog.newInstance(ConfirmDeleteDialog.ACTION_DELETE_COMPLETED);
-            dialog.show(getSupportFragmentManager(), ConfirmDeleteDialog.TAG);
+            dialog.show(getChildFragmentManager(), ConfirmDeleteDialog.TAG);
         });
 
         tvVersion.setText(getString(R.string.version) + " " + BuildConfig.VERSION_NAME);
@@ -106,10 +113,10 @@ public class SettingsActivity extends AppCompatActivity implements ConfirmDelete
             }
         });
 
-        var settings_layout = findViewById(R.id.settings_activity_screen);
-        ViewCompat.setOnApplyWindowInsetsListener(settings_layout, (view, insets) -> {
+        var settings_layout = view.findViewById(R.id.settings_fragment_screen);
+        ViewCompat.setOnApplyWindowInsetsListener(settings_layout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(
+            v.setPadding(
                     systemBars.left,
                     systemBars.top,
                     systemBars.right,
@@ -120,7 +127,7 @@ public class SettingsActivity extends AppCompatActivity implements ConfirmDelete
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         loadAndSetUserInfo();
     }
@@ -149,6 +156,6 @@ public class SettingsActivity extends AppCompatActivity implements ConfirmDelete
     @Override
     public void onDeleteCompletedTasksConfirmed() {
         viewModel.deleteCompletedTodos();
-        Toast.makeText(this, getString(R.string.completed_tasks_removed), Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.completed_tasks_removed), Toast.LENGTH_SHORT).show();
     }
 }

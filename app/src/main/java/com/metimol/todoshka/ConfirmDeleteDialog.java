@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.metimol.todoshka.database.Category;
@@ -75,14 +76,13 @@ public class ConfirmDeleteDialog extends DialogFragment {
             }
         }
 
-        if (getParentFragment() instanceof ConfirmDeleteListener) {
-            listener = (ConfirmDeleteListener) getParentFragment();
+        Fragment parentFragment = getParentFragment();
+        if (parentFragment instanceof ConfirmDeleteListener) {
+            listener = (ConfirmDeleteListener) parentFragment;
         } else if (getActivity() instanceof ConfirmDeleteListener) {
             listener = (ConfirmDeleteListener) getActivity();
         } else {
-            if (getActivity() instanceof SettingsActivity || getActivity() instanceof EditCategoriesActivity || getActivity() instanceof TaskInfoActivity) {} else {
-                throw new ClassCastException("Calling context must implement ConfirmDeleteListener");
-            }
+            throw new ClassCastException("Calling context must implement ConfirmDeleteListener");
         }
     }
 
@@ -99,14 +99,6 @@ public class ConfirmDeleteDialog extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        if (getActivity() instanceof ConfirmDeleteListener) {
-            listener = (ConfirmDeleteListener) getActivity();
-        } else if (getParentFragment() instanceof ConfirmDeleteListener) {
-            listener = (ConfirmDeleteListener) getParentFragment();
-        } else {
-            throw new ClassCastException("Calling context must implement ConfirmDeleteListener: " + requireActivity().toString());
-        }
 
         MaterialButton btnCancel = view.findViewById(R.id.btnCancel);
         MaterialButton btnDelete = view.findViewById(R.id.btnDelete);
