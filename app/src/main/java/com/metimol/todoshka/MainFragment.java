@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.metimol.todoshka.database.AppDatabase;
 import com.metimol.todoshka.database.Category;
 import com.metimol.todoshka.database.ToDo;
@@ -128,6 +129,9 @@ public class MainFragment extends Fragment implements TaskAdapter.OnTaskCheckedL
         );
 
         ivSettings.setOnClickListener(v -> {
+            setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, true));
+            setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, false));
+
             Navigation.findNavController(v).navigate(R.id.action_mainFragment_to_settingsFragment);
         });
 
@@ -369,6 +373,9 @@ public class MainFragment extends Fragment implements TaskAdapter.OnTaskCheckedL
 
     @Override
     public void onTaskClick(ToDo task) {
+        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+
         Bundle args = new Bundle();
         args.putParcelable("task", task);
         Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_taskInfoFragment, args);

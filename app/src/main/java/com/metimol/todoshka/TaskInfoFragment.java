@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.metimol.todoshka.database.Category;
 import com.metimol.todoshka.database.ToDo;
 import com.metimol.todoshka.database.ToDoDao;
@@ -43,6 +44,10 @@ public class TaskInfoFragment extends Fragment implements ConfirmDeleteDialog.Co
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+
         if (getArguments() != null) {
             currentTask = getArguments().getParcelable("task");
         }

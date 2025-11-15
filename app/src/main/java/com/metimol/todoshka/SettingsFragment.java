@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.metimol.todoshka.database.Category;
 import com.metimol.todoshka.database.ToDo;
 
@@ -35,6 +36,14 @@ public class SettingsFragment extends Fragment implements ConfirmDeleteDialog.Co
     private TextView tvUserName;
     private ImageView ivAvatar;
     private MainViewModel viewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, true));
+        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.Z, false));
+    }
 
     @Nullable
     @Override

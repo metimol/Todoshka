@@ -55,4 +55,5 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.material.v1120)
 }

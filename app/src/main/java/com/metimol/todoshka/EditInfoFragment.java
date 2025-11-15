@@ -1,4 +1,5 @@
 package com.metimol.todoshka;
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.metimol.todoshka.Utils;
 
 import android.content.Context;
@@ -35,6 +36,14 @@ public class EditInfoFragment extends Fragment {
     private ColorStateList transparentColor;
     private float strokeSelectedPx;
     private int paddingSelectedPx;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+    }
 
     @Nullable
     @Override

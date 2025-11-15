@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.metimol.todoshka.database.Category;
 import com.metimol.todoshka.database.ToDo;
 
@@ -42,6 +43,14 @@ public class EditCategoriesFragment extends Fragment implements
     private RecyclerView rvCategories;
     private PopupWindow popupWindow;
     private ItemTouchHelper itemTouchHelper;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        setReturnTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+    }
 
     @Nullable
     @Override

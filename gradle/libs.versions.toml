@@ -7,6 +7,7 @@ junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 appcompat = "1.7.1"
 material = "1.13.0"
+materialVersion = "1.13.0"
 navigationFragment = "2.9.6"
 navigationUi = "2.9.6"
 room = "2.8.2"
@@ -21,6 +22,7 @@ ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitV
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+material-v1120 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigationUi" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
