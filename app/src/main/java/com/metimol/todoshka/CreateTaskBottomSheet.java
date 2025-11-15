@@ -36,6 +36,7 @@ import java.util.List;
 public class CreateTaskBottomSheet extends BottomSheetDialogFragment {
     public static final String TAG = "CreateTaskBottomSheet";
     public static final String REQUEST_KEY = "taskBottomSheetDismissed";
+    public static final String ARG_CURRENT_CATEGORY_ID = "current_category_id";
 
     public enum Priority {
         LOW(R.drawable.ic_priority_low),
@@ -59,8 +60,17 @@ public class CreateTaskBottomSheet extends BottomSheetDialogFragment {
     private Category selectedCategory;
     private ImageButton selectedPriority;
     private Priority currentPriority;
+    private int currentCategoryId = MainViewModel.ALL_CATEGORIES_ID;
 
     private ToDoDao toDoDao;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            currentCategoryId = getArguments().getInt(ARG_CURRENT_CATEGORY_ID, MainViewModel.ALL_CATEGORIES_ID);
+        }
+    }
 
     @Nullable
     @Override
@@ -145,11 +155,24 @@ public class CreateTaskBottomSheet extends BottomSheetDialogFragment {
 
             requireActivity().runOnUiThread(() -> {
                 if (categories != null && !categories.isEmpty()) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                        selectedCategory = categories.getFirst();
-                    } else if (!categories.isEmpty()) {
-                        selectedCategory = categories.get(0);
+                    selectedCategory = null;
+                    if (currentCategoryId != MainViewModel.ALL_CATEGORIES_ID) {
+                        for (Category cat : categories) {
+                            if (cat.id == currentCategoryId) {
+                                selectedCategory = cat;
+                                break;
+                            }
+                        }
                     }
+
+                    if (selectedCategory == null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                            selectedCategory = categories.getFirst();
+                        } else if (!categories.isEmpty()) {
+                            selectedCategory = categories.get(0);
+                        }
+                    }
+
                     if (selectedCategory != null) {
                         tvSelectedCategory.setText(selectedCategory.name);
                     } else {

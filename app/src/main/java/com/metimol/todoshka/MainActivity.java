@@ -130,6 +130,16 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         fab.setOnClickListener(v -> {
             fab.hide();
             CreateTaskBottomSheet bottomSheet = new CreateTaskBottomSheet();
+
+            Integer currentCatId = viewModel.currentCategoryId.getValue();
+            if (currentCatId == null) {
+                currentCatId = MainViewModel.ALL_CATEGORIES_ID;
+            }
+
+            Bundle args = new Bundle();
+            args.putInt(CreateTaskBottomSheet.ARG_CURRENT_CATEGORY_ID, currentCatId);
+            bottomSheet.setArguments(args);
+
             bottomSheet.show(getSupportFragmentManager(), CreateTaskBottomSheet.TAG);
         });
 
